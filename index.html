@@ -27,6 +27,14 @@
     .hidden-tab {
       display: none;
     }
+    /* Скрытие скроллбара для мобильного меню */
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
 <body class="bg-[#F5FAFF] text-slate-800 font-sans min-h-screen relative">
@@ -36,137 +44,137 @@
   <div class="fixed inset-0 z-0 bg-gradient-to-b from-[#F5FAFF]/80 via-[#F5FAFF]/95 to-[#F5FAFF]"></div>
 
   <!-- Основной контейнер -->
-  <div class="max-w-6xl mx-auto p-4 md:p-8 flex flex-col gap-6 relative z-10">
+  <div class="max-w-6xl mx-auto p-4 md:p-8 flex flex-col gap-5 md:gap-6 relative z-10">
     
     <!-- Заголовок -->
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-200 pb-6 gap-4">
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-200 pb-4 md:pb-6 gap-3 md:gap-4">
       <div>
-        <h1 class="text-3xl font-bold text-slate-900 flex items-center gap-3">
-          <i data-lucide="shield-alert" class="text-red-600 w-8 h-8"></i>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-2 md:gap-3">
+          <i data-lucide="shield-alert" class="text-red-600 w-6 h-6 md:w-8 md:h-8 shrink-0"></i>
           Прогноз развития мира
         </h1>
-        <p class="text-slate-500 mt-2 text-lg">
+        <p class="text-slate-500 mt-1 md:mt-2 text-sm md:text-lg">
           интерактивная панель на основе тезисов Андрея Фурсова
         </p>
       </div>
-      <div class="bg-red-50 text-red-600 px-4 py-2 rounded-lg border border-red-200 flex items-center gap-2">
-        <i data-lucide="zap" class="w-5 h-5"></i>
-        <span class="font-semibold">Текущая фаза: вход в Темновековье</span>
+      <div class="bg-red-50 text-red-600 px-3 py-1.5 md:px-4 md:py-2 rounded-lg border border-red-200 flex items-center gap-2 text-sm md:text-base self-start md:self-auto w-full md:w-auto">
+        <i data-lucide="zap" class="w-4 h-4 md:w-5 md:h-5 shrink-0"></i>
+        <span class="font-semibold truncate">Текущая фаза: вход в Темновековье</span>
       </div>
     </header>
 
     <!-- Навигация (Вкладки) -->
-    <div class="flex flex-wrap gap-2 mb-2" id="tabs-container">
-      <button onclick="switchTab('overview')" id="btn-overview" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-blue-600 text-white shadow-md shadow-blue-500/30 border border-blue-600">
-        <i data-lucide="globe" class="w-5 h-5"></i> Сводка
+    <div class="flex flex-nowrap md:flex-wrap gap-2 mb-1 md:mb-2 overflow-x-auto hide-scrollbar pb-2" id="tabs-container">
+      <button onclick="switchTab('overview')" id="btn-overview" class="tab-btn shrink-0 flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-medium transition-all duration-200 bg-blue-600 text-white shadow-md shadow-blue-500/30 border border-blue-600 text-sm md:text-base">
+        <i data-lucide="globe" class="w-4 h-4 md:w-5 md:h-5"></i> Сводка
       </button>
-      <button onclick="switchTab('elites')" id="btn-elites" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-slate-900">
-        <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Элиты и Экономика
+      <button onclick="switchTab('elites')" id="btn-elites" class="tab-btn shrink-0 flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-medium transition-all duration-200 bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-slate-900 text-sm md:text-base">
+        <i data-lucide="bar-chart-3" class="w-4 h-4 md:w-5 md:h-5"></i> Элиты и Экономика
       </button>
-      <button onclick="switchTab('geopolitics')" id="btn-geopolitics" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-slate-900">
-        <i data-lucide="map" class="w-5 h-5"></i> Геополитика
+      <button onclick="switchTab('geopolitics')" id="btn-geopolitics" class="tab-btn shrink-0 flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-medium transition-all duration-200 bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-slate-900 text-sm md:text-base">
+        <i data-lucide="map" class="w-4 h-4 md:w-5 md:h-5"></i> Геополитика
       </button>
-      <button onclick="switchTab('future')" id="btn-future" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-slate-900">
-        <i data-lucide="brain-circuit" class="w-5 h-5"></i> Будущее
+      <button onclick="switchTab('future')" id="btn-future" class="tab-btn shrink-0 flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-medium transition-all duration-200 bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-slate-900 text-sm md:text-base">
+        <i data-lucide="brain-circuit" class="w-4 h-4 md:w-5 md:h-5"></i> Будущее
       </button>
     </div>
 
     <!-- Область контента -->
-    <main class="bg-white/70 backdrop-blur-md rounded-2xl p-6 border border-white shadow-xl min-h-[500px]">
+    <main class="bg-white/70 backdrop-blur-md rounded-xl md:rounded-2xl p-4 md:p-6 border border-white shadow-xl min-h-[400px] md:min-h-[500px]">
       
       <!-- Вкладка: СВОДКА -->
-      <div id="tab-overview" class="tab-content animate-in space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+      <div id="tab-overview" class="tab-content animate-in space-y-4 md:space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+          <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start">
-              <p class="text-slate-500 font-medium">Период турбулентности</p>
-              <i data-lucide="globe" class="text-blue-600 w-5 h-5"></i>
+              <p class="text-slate-500 font-medium text-sm md:text-base">Период турбулентности</p>
+              <i data-lucide="globe" class="text-blue-600 w-4 h-4 md:w-5 md:h-5"></i>
             </div>
-            <h3 class="text-3xl font-bold text-slate-900 mt-2">60–70 лет</h3>
-            <p class="text-sm text-slate-600 mt-2">эпоха «войномира», где стерта грань между войной и миром.</p>
+            <h3 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1 md:mt-2">60–70 лет</h3>
+            <p class="text-xs md:text-sm text-slate-600 mt-1 md:mt-2">эпоха «войномира», где стерта грань между войной и миром.</p>
           </div>
-          <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+          <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start">
-              <p class="text-slate-500 font-medium">Главная мишень</p>
-              <i data-lucide="trending-down" class="text-orange-500 w-5 h-5"></i>
+              <p class="text-slate-500 font-medium text-sm md:text-base">Главная мишень</p>
+              <i data-lucide="trending-down" class="text-orange-500 w-4 h-4 md:w-5 md:h-5"></i>
             </div>
-            <h3 class="text-3xl font-bold text-slate-900 mt-2">Средний класс</h3>
-            <p class="text-sm text-slate-600 mt-2">экспроприация активов при переходе к посткапитализму.</p>
+            <h3 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1 md:mt-2">Средний класс</h3>
+            <p class="text-xs md:text-sm text-slate-600 mt-1 md:mt-2">экспроприация активов при переходе к посткапитализму.</p>
           </div>
-          <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+          <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start">
-              <p class="text-slate-500 font-medium">Историческая аналогия</p>
-              <i data-lucide="swords" class="text-red-500 w-5 h-5"></i>
+              <p class="text-slate-500 font-medium text-sm md:text-base">Историческая аналогия</p>
+              <i data-lucide="swords" class="text-red-500 w-4 h-4 md:w-5 md:h-5"></i>
             </div>
-            <h3 class="text-xl font-bold text-slate-900 mt-2 leading-tight">Тридцатилетняя война 2.0</h3>
-            <p class="text-sm text-slate-600 mt-2">рождение новой системы через серию локальных конфликтов.</p>
+            <h3 class="text-lg md:text-xl font-bold text-slate-900 mt-1 md:mt-2 leading-tight">Тридцатилетняя война 2.0</h3>
+            <p class="text-xs md:text-sm text-slate-600 mt-1 md:mt-2">рождение новой системы через серию локальных конфликтов.</p>
           </div>
         </div>
-        <div class="bg-blue-50/80 backdrop-blur-md border border-blue-100 p-6 rounded-xl mt-6 shadow-sm">
-          <h2 class="text-xl font-bold text-blue-800 mb-4 flex items-center gap-2">
-            <i data-lucide="shield-alert" class="w-6 h-6"></i> Ключевой тезис
+        <div class="bg-blue-50/80 backdrop-blur-md border border-blue-100 p-4 md:p-6 rounded-xl mt-4 md:mt-6 shadow-sm">
+          <h2 class="text-lg md:text-xl font-bold text-blue-800 mb-2 md:mb-4 flex items-center gap-2">
+            <i data-lucide="shield-alert" class="w-5 h-5 md:w-6 md:h-6"></i> Ключевой тезис
           </h2>
-          <p class="text-slate-700 leading-relaxed text-lg">
+          <p class="text-slate-700 leading-relaxed text-sm md:text-lg">
             Стабильность (как в 1945–1991 годах) – это историческая аномалия. Мы входим в фазу жесткого слома старой системы, где новые социальные структуры появляются в откровенно криминальном или гибридном виде. Испугаться не стоит: пугаться стыдно и поздно.
           </p>
         </div>
       </div>
 
       <!-- Вкладка: ЭЛИТЫ И ЭКОНОМИКА -->
-      <div id="tab-elites" class="tab-content hidden-tab animate-in space-y-6">
-        <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <h3 class="text-lg font-bold text-slate-900 mb-4">Структура мирового богатства (активы ~90 трлн $)</h3>
-          <div class="space-y-4">
+      <div id="tab-elites" class="tab-content hidden-tab animate-in space-y-4 md:space-y-6">
+        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-100 shadow-sm">
+          <h3 class="text-base md:text-lg font-bold text-slate-900 mb-3 md:mb-4">Структура мирового богатства (активы ~90 трлн $)</h3>
+          <div class="space-y-3 md:space-y-4">
             <div>
-              <div class="flex justify-between text-sm mb-1">
+              <div class="flex flex-col md:flex-row md:justify-between text-xs md:text-sm mb-1">
                 <span class="text-slate-600">1% населения (Мировая элита)</span>
                 <span class="font-bold text-red-600">35 трлн $ (39%)</span>
               </div>
-              <div class="w-full bg-slate-100 rounded-full h-4">
-                <div class="bg-red-500 h-4 rounded-full" style="width: 39%"></div>
+              <div class="w-full bg-slate-100 rounded-full h-3 md:h-4">
+                <div class="bg-red-500 h-3 md:h-4 rounded-full" style="width: 39%"></div>
               </div>
             </div>
             <div>
-              <div class="flex justify-between text-sm mb-1">
-                <span class="text-slate-600">12–15% населения (Средний класс – цель экспроприации)</span>
+              <div class="flex flex-col md:flex-row md:justify-between text-xs md:text-sm mb-1">
+                <span class="text-slate-600">12–15% населения (Средний класс)</span>
                 <span class="font-bold text-orange-500">40 трлн $ (44%)</span>
               </div>
-              <div class="w-full bg-slate-100 rounded-full h-4">
-                <div class="bg-orange-400 h-4 rounded-full" style="width: 44%"></div>
+              <div class="w-full bg-slate-100 rounded-full h-3 md:h-4">
+                <div class="bg-orange-400 h-3 md:h-4 rounded-full" style="width: 44%"></div>
               </div>
-              <p class="text-xs text-slate-500 mt-2 italic">цель элиты: отобрать эти ресурсы, так как в новом мире среднего класса быть не должно.</p>
+              <p class="text-[10px] md:text-xs text-slate-500 mt-1.5 md:mt-2 italic">цель элиты: отобрать эти ресурсы, так как в новом мире среднего класса быть не должно.</p>
             </div>
             <div>
-              <div class="flex justify-between text-sm mb-1">
+              <div class="flex flex-col md:flex-row md:justify-between text-xs md:text-sm mb-1">
                 <span class="text-slate-600">85% населения (Остальной мир)</span>
                 <span class="font-bold text-blue-600">15 трлн $ (17%)</span>
               </div>
-              <div class="w-full bg-slate-100 rounded-full h-4">
-                <div class="bg-blue-500 h-4 rounded-full" style="width: 17%"></div>
+              <div class="w-full bg-slate-100 rounded-full h-3 md:h-4">
+                <div class="bg-blue-500 h-3 md:h-4 rounded-full" style="width: 17%"></div>
               </div>
             </div>
           </div>
         </div>
-        <h3 class="text-xl font-bold text-slate-900 mt-8 mb-4">Схватка проектов будущего</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-gradient-to-br from-white to-indigo-50/50 p-6 rounded-xl border border-indigo-100 shadow-sm hover:shadow-md transition-all">
-            <div class="flex items-center gap-3 mb-4">
-              <i data-lucide="skull" class="text-indigo-600 w-7 h-7"></i>
-              <h4 class="text-lg font-bold text-indigo-800">Ультраглобалисты</h4>
+        <h3 class="text-lg md:text-xl font-bold text-slate-900 mt-6 md:mt-8 mb-3 md:mb-4">Схватка проектов будущего</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <div class="bg-gradient-to-br from-white to-indigo-50/50 p-4 md:p-6 rounded-xl border border-indigo-100 shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+              <i data-lucide="skull" class="text-indigo-600 w-6 h-6 md:w-7 md:h-7 shrink-0"></i>
+              <h4 class="text-base md:text-lg font-bold text-indigo-800">Ультраглобалисты</h4>
             </div>
-            <ul class="space-y-3 text-slate-700 text-sm">
+            <ul class="space-y-2 md:space-y-3 text-slate-700 text-xs md:text-sm">
               <li><strong class="text-indigo-700">Лидеры:</strong> Шваб, Харари (проект «Чужой»).</li>
               <li><strong class="text-indigo-700">Суть:</strong> био-эко-фашизм.</li>
               <li><strong class="text-indigo-700">Цель:</strong> изменение биологической природы человека, сокращение населения.</li>
               <li><strong class="text-indigo-700">Методы:</strong> пандемии, медицинский контроль, разрушение государств в пользу мегакорпораций.</li>
             </ul>
           </div>
-          <div class="bg-gradient-to-br from-white to-amber-50/50 p-6 rounded-xl border border-amber-100 shadow-sm hover:shadow-md transition-all">
-            <div class="flex items-center gap-3 mb-4">
-              <i data-lucide="zap" class="text-amber-500 w-7 h-7"></i>
-              <h4 class="text-lg font-bold text-amber-800">Трамписты (Промышленники)</h4>
+          <div class="bg-gradient-to-br from-white to-amber-50/50 p-4 md:p-6 rounded-xl border border-amber-100 shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+              <i data-lucide="zap" class="text-amber-500 w-6 h-6 md:w-7 md:h-7 shrink-0"></i>
+              <h4 class="text-base md:text-lg font-bold text-amber-800">Трамписты (Промышленники)</h4>
             </div>
-            <ul class="space-y-3 text-slate-700 text-sm">
+            <ul class="space-y-2 md:space-y-3 text-slate-700 text-xs md:text-sm">
               <li><strong class="text-amber-700">Лидеры:</strong> Трамп, Маск (проект «Хищник»).</li>
               <li><strong class="text-amber-700">Суть:</strong> техно-фашизм.</li>
               <li><strong class="text-amber-700">Цель:</strong> создание макрозон во главе с Северной Америкой (технат).</li>
@@ -177,78 +185,83 @@
       </div>
 
       <!-- Вкладка: ГЕОПОЛИТИКА -->
-      <div id="tab-geopolitics" class="tab-content hidden-tab animate-in space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="bg-white p-6 rounded-xl border border-slate-100 flex flex-col hover:shadow-md transition-shadow shadow-sm">
-            <h3 class="text-lg font-bold text-red-600 mb-3 border-b border-slate-100 pb-2">Европа: жертва №1</h3>
-            <p class="text-sm text-slate-600 flex-grow">Западная Европа пошла «под нож» первой из-за политической слабости и огромных накоплений среднего класса.</p>
-            <div class="mt-4 bg-slate-50 p-3 rounded-lg text-xs text-slate-600">
+      <div id="tab-geopolitics" class="tab-content hidden-tab animate-in space-y-4 md:space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-100 flex flex-col hover:shadow-md transition-shadow shadow-sm">
+            <h3 class="text-base md:text-lg font-bold text-red-600 mb-2 md:mb-3 border-b border-slate-100 pb-2">Европа: жертва №1</h3>
+            <p class="text-xs md:text-sm text-slate-600 flex-grow">Западная Европа пошла «под нож» первой из-за политической слабости и огромных накоплений среднего класса.</p>
+            <div class="mt-3 md:mt-4 bg-slate-50 p-3 rounded-lg text-xs text-slate-600">
               <strong class="text-slate-800 block mb-1">Инструменты уничтожения:</strong> налоги, зеленая повестка, миграция (мигранты – это этническое оружие).
             </div>
           </div>
-          <div class="bg-white p-6 rounded-xl border border-slate-100 flex flex-col hover:shadow-md transition-shadow shadow-sm">
-            <h3 class="text-lg font-bold text-yellow-600 mb-3 border-b border-slate-100 pb-2">Украина: таран</h3>
-            <p class="text-sm text-slate-600 flex-grow">Используется англосаксами для ослабления Европы (отсечение от дешевых ресурсов РФ) и оттока капиталов в США.</p>
-            <div class="mt-4 bg-slate-50 p-3 rounded-lg text-xs text-slate-600">
+          <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-100 flex flex-col hover:shadow-md transition-shadow shadow-sm">
+            <h3 class="text-base md:text-lg font-bold text-yellow-600 mb-2 md:mb-3 border-b border-slate-100 pb-2">Украина: таран</h3>
+            <p class="text-xs md:text-sm text-slate-600 flex-grow">Используется англосаксами для ослабления Европы (отсечение от дешевых ресурсов РФ) и оттока капиталов в США.</p>
+            <div class="mt-3 md:mt-4 bg-slate-50 p-3 rounded-lg text-xs text-slate-600">
               <strong class="text-slate-800 block mb-1">Итог:</strong> стравливание двух славянских народов для решения западных экономических проблем и уменьшения населения.
             </div>
           </div>
-          <div class="bg-white p-6 rounded-xl border border-slate-100 flex flex-col hover:shadow-md transition-shadow shadow-sm">
-            <h3 class="text-lg font-bold text-green-600 mb-3 border-b border-slate-100 pb-2">Россия: стратегия</h3>
-            <p class="text-sm text-slate-600 flex-grow">Интерес РФ – в разрушении Евросоюза (наследника проекта Гитлера) и выстраивании двусторонних отношений со странами.</p>
-            <div class="mt-4 bg-slate-50 p-3 rounded-lg text-xs text-slate-600">
+          <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-100 flex flex-col hover:shadow-md transition-shadow shadow-sm">
+            <h3 class="text-base md:text-lg font-bold text-green-600 mb-2 md:mb-3 border-b border-slate-100 pb-2">Россия: стратегия</h3>
+            <p class="text-xs md:text-sm text-slate-600 flex-grow">Интерес РФ – в разрушении Евросоюза (наследника проекта Гитлера) и выстраивании двусторонних отношений со странами.</p>
+            <div class="mt-3 md:mt-4 bg-slate-50 p-3 rounded-lg text-xs text-slate-600">
               <strong class="text-slate-800 block mb-1">Причины устойчивости:</strong> высокий болевой порог общества, спасительные неформальные связи и смекалка (адаптивность).
             </div>
           </div>
         </div>
-        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 mt-4 shadow-sm">
-          <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
-            <i data-lucide="map" class="w-5 h-5 text-slate-500"></i> Британия против США
+        <div class="bg-slate-50 p-4 md:p-5 rounded-xl border border-slate-200 mt-2 md:mt-4 shadow-sm">
+          <h4 class="text-sm md:text-base font-bold text-slate-800 mb-2 flex items-center gap-2">
+            <i data-lucide="map" class="w-4 h-4 md:w-5 md:h-5 text-slate-500 shrink-0"></i> Британия против США
           </h4>
-          <p class="text-sm text-slate-600">Внутри «англосаксонского единства» идет жесточайшая борьба. Британская элита пытается создать «Глобальную Британию» и вернуть контроль над США в рамках наднационального класса, беря реванш за разрушение Британской империи американцами в 1956 году.</p>
+          <p class="text-xs md:text-sm text-slate-600">Внутри «англосаксонского единства» идет жесточайшая борьба. Британская элита пытается создать «Глобальную Британию» и вернуть контроль над США в рамках наднационального класса, беря реванш за разрушение Британской империи американцами в 1956 году.</p>
         </div>
       </div>
 
       <!-- Вкладка: БУДУЩЕЕ -->
-      <div id="tab-future" class="tab-content hidden-tab animate-in space-y-6">
-        <div class="text-center max-w-2xl mx-auto mb-8">
-          <i data-lucide="heart-pulse" class="text-pink-500 w-12 h-12 mx-auto mb-4"></i>
-          <h2 class="text-2xl font-bold text-slate-900 mb-2">Антропологический переход</h2>
-          <p class="text-slate-500">Главная угроза – разделение человечества на два биологических вида (концепция Института Санта-Фе, 2018 год).</p>
+      <div id="tab-future" class="tab-content hidden-tab animate-in space-y-4 md:space-y-6">
+        <div class="text-center max-w-2xl mx-auto mb-6 md:mb-8">
+          <i data-lucide="heart-pulse" class="text-pink-500 w-8 h-8 md:w-12 md:h-12 mx-auto mb-2 md:mb-4"></i>
+          <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-2">Антропологический переход</h2>
+          <p class="text-xs md:text-sm text-slate-500">Главная угроза – разделение человечества на два биологических вида (концепция Института Санта-Фе, 2018 год).</p>
         </div>
-        <div class="flex flex-col md:flex-row gap-6 items-stretch justify-center">
-          <div class="flex-1 bg-white rounded-xl p-6 border border-green-200 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <div class="absolute top-0 right-0 p-4 opacity-5">
-              <i data-lucide="users" class="w-24 h-24 text-green-800"></i>
+        <div class="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch justify-center relative">
+          <div class="flex-1 bg-white rounded-xl p-4 md:p-6 border border-green-200 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="absolute top-0 right-0 p-3 md:p-4 opacity-5">
+              <i data-lucide="users" class="w-16 h-16 md:w-24 md:h-24 text-green-800"></i>
             </div>
-            <h3 class="text-xl font-bold text-green-600 mb-2">Каста «Верхов»</h3>
-            <div class="text-4xl font-black text-slate-900 mb-4">120–140 <span class="text-lg font-normal text-slate-500">лет жизни</span></div>
-            <ul class="space-y-2 text-sm text-slate-600">
-              <li class="flex items-center gap-2"><span class="text-green-500 font-bold">✓</span> проживание в экологически чистых анклавах;</li>
-              <li class="flex items-center gap-2"><span class="text-green-500 font-bold">✓</span> натуральное органическое питание;</li>
-              <li class="flex items-center gap-2"><span class="text-green-500 font-bold">✓</span> доступ к передовой биотехнологической медицине.</li>
+            <h3 class="text-lg md:text-xl font-bold text-green-600 mb-1 md:mb-2">Каста «Верхов»</h3>
+            <div class="text-3xl md:text-4xl font-black text-slate-900 mb-3 md:mb-4">120–140 <span class="text-sm md:text-lg font-normal text-slate-500">лет жизни</span></div>
+            <ul class="space-y-1.5 md:space-y-2 text-xs md:text-sm text-slate-600">
+              <li class="flex items-start md:items-center gap-2"><span class="text-green-500 font-bold shrink-0">✓</span> проживание в экологически чистых анклавах;</li>
+              <li class="flex items-start md:items-center gap-2"><span class="text-green-500 font-bold shrink-0">✓</span> натуральное органическое питание;</li>
+              <li class="flex items-start md:items-center gap-2"><span class="text-green-500 font-bold shrink-0">✓</span> доступ к передовой биотехнологической медицине.</li>
             </ul>
           </div>
-          <div class="flex items-center justify-center">
+          
+          <!-- Разделитель ПРОТИВ -->
+          <div class="flex items-center justify-center -my-2 md:my-0 z-10">
+            <div class="w-px h-6 bg-slate-300 block md:hidden"></div>
             <div class="w-12 h-px bg-slate-300 hidden md:block"></div>
-            <div class="bg-white border border-slate-200 px-4 py-2 rounded-full text-sm font-bold text-slate-500 absolute z-10 md:relative shadow-sm">ПРОТИВ</div>
+            <div class="bg-white border border-slate-200 px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold text-slate-500 absolute md:relative shadow-sm">ПРОТИВ</div>
+            <div class="w-px h-6 bg-slate-300 block md:hidden"></div>
             <div class="w-12 h-px bg-slate-300 hidden md:block"></div>
           </div>
-          <div class="flex-1 bg-white rounded-xl p-6 border border-red-200 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <div class="absolute top-0 right-0 p-4 opacity-5">
-              <i data-lucide="skull" class="w-24 h-24 text-red-800"></i>
+
+          <div class="flex-1 bg-white rounded-xl p-4 md:p-6 border border-red-200 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="absolute top-0 right-0 p-3 md:p-4 opacity-5">
+              <i data-lucide="skull" class="w-16 h-16 md:w-24 md:h-24 text-red-800"></i>
             </div>
-            <h3 class="text-xl font-bold text-red-600 mb-2">Каста «Низов»</h3>
-            <div class="text-4xl font-black text-slate-900 mb-4">40–60 <span class="text-lg font-normal text-slate-500">лет жизни</span></div>
-            <ul class="space-y-2 text-sm text-slate-600">
-              <li class="flex items-center gap-2"><span class="text-red-500 font-bold">×</span> жизнь в условиях виртуальной реальности (метавселенные);</li>
-              <li class="flex items-center gap-2"><span class="text-red-500 font-bold">×</span> синтетическая еда;</li>
-              <li class="flex items-center gap-2"><span class="text-red-500 font-bold">×</span> постоянная вакцинация и медицинский контроль «Биг Фармы».</li>
+            <h3 class="text-lg md:text-xl font-bold text-red-600 mb-1 md:mb-2">Каста «Низов»</h3>
+            <div class="text-3xl md:text-4xl font-black text-slate-900 mb-3 md:mb-4">40–60 <span class="text-sm md:text-lg font-normal text-slate-500">лет жизни</span></div>
+            <ul class="space-y-1.5 md:space-y-2 text-xs md:text-sm text-slate-600">
+              <li class="flex items-start md:items-center gap-2"><span class="text-red-500 font-bold shrink-0">×</span> жизнь в условиях виртуальной реальности (метавселенные);</li>
+              <li class="flex items-start md:items-center gap-2"><span class="text-red-500 font-bold shrink-0">×</span> синтетическая еда;</li>
+              <li class="flex items-start md:items-center gap-2"><span class="text-red-500 font-bold shrink-0">×</span> постоянная вакцинация и медицинский контроль «Биг Фармы».</li>
             </ul>
           </div>
         </div>
-        <div class="bg-orange-50 border border-orange-100 p-6 rounded-xl mt-6 shadow-sm">
-          <p class="text-slate-700 text-sm leading-relaxed text-center">
+        <div class="bg-orange-50 border border-orange-100 p-4 md:p-6 rounded-xl mt-4 md:mt-6 shadow-sm">
+          <p class="text-slate-700 text-xs md:text-sm leading-relaxed text-center">
             <strong class="text-orange-800">Суть борьбы сегодня:</strong> это уже не просто классовая или геополитическая схватка. Это сопротивление плану ультраглобалистов ради того, чтобы человек просто остался человеком, сохранив свою биологическую независимость. Чем больше сопротивления сейчас (саботаж, отказ от «новой нормальности»), тем мягче будет посткапиталистический строй в будущем.
           </p>
         </div>
@@ -276,12 +289,12 @@
       
       // Сбрасываем стили кнопок на неактивные (светлая тема)
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.className = "tab-btn flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-slate-900";
+        btn.className = "tab-btn shrink-0 flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-medium transition-all duration-200 bg-white text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 hover:text-slate-900 text-sm md:text-base";
       });
       
       // Активируем нужную кнопку (синий цвет)
       const activeBtn = document.getElementById('btn-' + tabId);
-      activeBtn.className = "tab-btn flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-blue-600 text-white shadow-md shadow-blue-500/30 border border-blue-600";
+      activeBtn.className = "tab-btn shrink-0 flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-medium transition-all duration-200 bg-blue-600 text-white shadow-md shadow-blue-500/30 border border-blue-600 text-sm md:text-base";
 
       // Скрываем все контентные блоки
       document.querySelectorAll('.tab-content').forEach(content => {
