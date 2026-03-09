@@ -103,7 +103,7 @@
     }
     
     .start-title {
-      font-size: 2rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: #1e293b;
       text-align: center;
@@ -112,9 +112,10 @@
     }
     .start-subtitle {
       color: var(--text-muted);
-      font-size: 1.125rem;
+      font-size: 0.875rem;
       font-weight: 500;
       margin-bottom: 1.5rem;
+      text-align: center;
     }
     @media (min-width: 768px) {
       .start-title { font-size: 3rem; }
@@ -123,10 +124,10 @@
     [data-theme="dark"] .start-title { color: #f8fafc; }
 
     .btn-start {
-      font-size: 1.75rem;
+      font-size: 1rem;
       font-weight: 800;
-      padding: 1.5rem 4rem;
-      border-radius: 1.5rem;
+      padding: 0.8rem 2.5rem;
+      border-radius: 1rem;
       background: var(--accent);
       color: #ffffff;
       border: none;
@@ -137,6 +138,13 @@
       letter-spacing: 0.1em;
       animation: pulse-start 2s infinite;
       -webkit-tap-highlight-color: transparent;
+    }
+    @media (min-width: 768px) {
+      .btn-start {
+        font-size: 1.75rem;
+        padding: 1.5rem 4rem;
+        border-radius: 1.5rem;
+      }
     }
     .btn-start:hover {
       transform: scale(1.05) translateY(-5px);
