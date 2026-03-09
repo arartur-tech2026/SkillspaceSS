@@ -1,725 +1,1688 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="light">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Аналитическая панель прогнозов</title>
-  
-  <script>
-    // Предварительная загрузка темы для избежания "моргания"
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-  </script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>ЕГЭ Обществознание – Карточки</title>
   <style>
-    /* Базовые переменные (Светлая тема) */
     :root {
-      --bg-color: #F5FAFF;
-      --text-main: #0f172a;
-      --text-muted: #475569;
-      --text-light: #64748b;
+      --bg-color: #f8fafc;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --card-front-bg: #ffffff;
+      --card-back-bg: #eff6ff;
       --border-color: #e2e8f0;
-      --blue-main: #2563eb;
-      --card-bg: #ffffff;
-      
-      --board-bg: rgba(255, 255, 255, 0.7);
-      --board-border: #ffffff;
-      --tab-bg-hover: #f8fafc;
-      --progress-bg: #f1f5f9;
-      --card-border: #f1f5f9;
-      --card-shadow-hover: rgba(0, 0, 0, 0.1);
-      
-      --badge-alert-bg: #fef2f2;
-      --badge-alert-border: #fecaca;
-      --badge-alert-text: #dc2626;
-
-      --alert-blue-bg: rgba(239, 246, 255, 0.8);
-      --alert-blue-border: #dbeafe;
-      --alert-blue-text: #1e40af;
-      
-      --alert-orange-bg: #fff7ed;
-      --alert-orange-border: #ffedd5;
-      --alert-orange-text: #9a3412;
-      
-      --alert-slate-bg: #f8fafc;
-      --alert-slate-border: #e2e8f0;
-
-      --grad-indigo: linear-gradient(to bottom right, #ffffff, rgba(238, 242, 255, 0.6));
-      --grad-amber: linear-gradient(to bottom right, #ffffff, rgba(255, 251, 235, 0.6));
-      --bg-overlay: linear-gradient(to bottom, rgba(245, 250, 255, 0.7), rgba(245, 250, 255, 0.95));
-
-      --card-green-border: #bbf7d0;
-      --card-red-border: #fecaca;
-      --vs-line: #cbd5e1;
-      --icon-bg-opacity: 0.05;
-
-      /* Динамические фоны */
-      --bg-overview: radial-gradient(circle at top right, #dbeafe 0%, transparent 40%), radial-gradient(circle at bottom left, #e0e7ff 0%, transparent 40%);
-      --bg-elites: radial-gradient(circle at top right, #f3e8ff 0%, transparent 40%), radial-gradient(circle at bottom left, #fce7f3 0%, transparent 40%);
-      --bg-geopolitics: radial-gradient(circle at top right, #ffedd5 0%, transparent 40%), radial-gradient(circle at bottom left, #fef3c7 0%, transparent 40%);
-      --bg-future: radial-gradient(circle at top right, #bbf7d0 0%, transparent 40%), radial-gradient(circle at bottom left, #fecaca 0%, transparent 40%);
-      --active-bg: var(--bg-overview);
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #10b981;
+      --shadow-color: rgba(0, 0, 0, 0.08);
     }
 
-    /* Темная тема */
     [data-theme="dark"] {
       --bg-color: #0f172a;
       --text-main: #f8fafc;
-      --text-muted: #cbd5e1;
-      --text-light: #94a3b8;
+      --text-muted: #94a3b8;
+      --card-front-bg: #1e293b;
+      --card-back-bg: #172554;
       --border-color: #334155;
-      --blue-main: #3b82f6;
-      --card-bg: #1e293b;
-
-      --board-bg: rgba(30, 41, 59, 0.7);
-      --board-border: #334155;
-      --tab-bg-hover: #334155;
-      --progress-bg: #334155;
-      --card-border: #334155;
-      --card-shadow-hover: rgba(0, 0, 0, 0.5);
-
-      --badge-alert-bg: rgba(153, 27, 27, 0.2);
-      --badge-alert-border: rgba(153, 27, 27, 0.5);
-      --badge-alert-text: #fca5a5;
-
-      --alert-blue-bg: rgba(30, 58, 138, 0.3);
-      --alert-blue-border: rgba(30, 58, 138, 0.6);
-      --alert-blue-text: #93c5fd;
-
-      --alert-orange-bg: rgba(124, 45, 18, 0.3);
-      --alert-orange-border: rgba(124, 45, 18, 0.6);
-      --alert-orange-text: #fdba74;
-
-      --alert-slate-bg: rgba(51, 65, 85, 0.4);
-      --alert-slate-border: #475569;
-
-      --grad-indigo: linear-gradient(to bottom right, #1e293b, rgba(49, 46, 129, 0.4));
-      --grad-amber: linear-gradient(to bottom right, #1e293b, rgba(120, 53, 15, 0.4));
-      --bg-overlay: linear-gradient(to bottom, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.98));
-
-      --card-green-border: rgba(22, 163, 74, 0.4);
-      --card-red-border: rgba(220, 38, 38, 0.4);
-      --vs-line: #475569;
-      --icon-bg-opacity: 0.1;
-
-      /* Темные динамические фоны */
-      --bg-overview: radial-gradient(circle at top right, rgba(30,58,138,0.2) 0%, transparent 40%), radial-gradient(circle at bottom left, rgba(49,46,129,0.2) 0%, transparent 40%);
-      --bg-elites: radial-gradient(circle at top right, rgba(88,28,135,0.2) 0%, transparent 40%), radial-gradient(circle at bottom left, rgba(157,23,77,0.2) 0%, transparent 40%);
-      --bg-geopolitics: radial-gradient(circle at top right, rgba(154,52,18,0.2) 0%, transparent 40%), radial-gradient(circle at bottom left, rgba(180,83,9,0.2) 0%, transparent 40%);
-      --bg-future: radial-gradient(circle at top right, rgba(21,128,61,0.2) 0%, transparent 40%), radial-gradient(circle at bottom left, rgba(153,27,27,0.2) 0%, transparent 40%);
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+      --success: #34d399;
+      --shadow-color: rgba(0, 0, 0, 0.4);
     }
 
-    body {
+    * { box-sizing: border-box; }
+    
+    html, body {
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, sans-serif;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
       background-color: var(--bg-color);
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    @supports (-webkit-touch-callout: none) {
+      html, body {
+        height: -webkit-fill-available;
+      }
+    }
+
+    :-webkit-full-screen {
+      width: 100% !important;
+      height: 100% !important;
+      background-color: var(--bg-color);
+    }
+
+    .start-screen-overlay, .app-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .app-container {
+      background: linear-gradient(135deg, var(--bg-color) 0%, var(--card-front-bg) 100%);
       color: var(--text-main);
-      min-height: 100vh;
-      position: relative;
-    }
-
-    /* Плавные переходы для всех элементов */
-    body, .card, .main-board, .tab-btn, .alert-box, .badge-alert, .theme-btn, .vs-badge, .bg-overlay {
-      transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
-    }
-
-    .bg-layer {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      opacity: 0.6;
-      background: var(--active-bg);
-      transition: background 1s ease-in-out;
-    }
-
-    .bg-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background: var(--bg-overlay);
-    }
-
-    .container {
-      max-width: 72rem;
-      margin: 0 auto;
+      transition: background 0.3s ease, color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: 1rem;
-      position: relative;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-    @media (min-width: 768px) { .container { padding: 2rem; gap: 1.5rem; } }
-
-    /* Шапка и кнопка темы */
-    .header {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 1rem;
+      z-index: 1;
     }
     @media (min-width: 768px) {
-      .header { flex-direction: row; justify-content: space-between; align-items: flex-end; padding-bottom: 1.5rem; gap: 1rem; }
+      .app-container { padding: 1.5rem 1rem; }
     }
-    .header h1 {
-      margin: 0;
-      font-size: 1.5rem;
-      font-weight: 700;
+
+    .start-screen-overlay {
+      background-color: #ffffff;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
+      z-index: 9999;
+      gap: 1.5rem;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
-    @media (min-width: 768px) { .header h1 { font-size: 1.875rem; gap: 0.75rem; } }
-    .header p { margin: 0.25rem 0 0 0; color: var(--text-light); font-size: 0.875rem; }
-    @media (min-width: 768px) { .header p { font-size: 1.125rem; margin-top: 0.5rem; } }
+    [data-theme="dark"] .start-screen-overlay {
+      background-color: #0f172a;
+    }
+    .start-screen-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    
+    .start-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1e293b;
+      text-align: center;
+      margin: 0;
+      padding: 0 1rem;
+    }
+    .start-subtitle {
+      color: var(--text-muted);
+      font-size: 1.125rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .start-title { font-size: 3rem; }
+      .start-subtitle { font-size: 1.5rem; }
+    }
+    [data-theme="dark"] .start-title { color: #f8fafc; }
+
+    .btn-start {
+      font-size: 1.75rem;
+      font-weight: 800;
+      padding: 1.5rem 4rem;
+      border-radius: 1.5rem;
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 10px 30px var(--shadow-color), 0 0 0 0 rgba(37, 99, 235, 0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      animation: pulse-start 2s infinite;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-start:hover {
+      transform: scale(1.05) translateY(-5px);
+      background: var(--accent-hover);
+    }
+    @keyframes pulse-start {
+      0% { box-shadow: 0 10px 30px var(--shadow-color), 0 0 0 0 rgba(37, 99, 235, 0.4); }
+      70% { box-shadow: 0 10px 30px var(--shadow-color), 0 0 0 20px rgba(37, 99, 235, 0); }
+      100% { box-shadow: 0 10px 30px var(--shadow-color), 0 0 0 0 rgba(37, 99, 235, 0); }
+    }
+
+    /* Header */
+    .header {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+      flex-shrink: 0;
+    }
+    @media (min-width: 768px) {
+      .header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+    }
+
+    .header-title { font-size: 1.25rem; line-height: 1.2; font-weight: 800; margin: 0 0 0.25rem 0; }
+    @media (min-width: 768px) {
+      .header-title { font-size: 1.75rem; margin: 0 0 0.5rem 0; }
+    }
+
+    .header-subtitle { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem; margin: 0; line-height: 1.2; font-weight: 500;}
+    @media (min-width: 768px) {
+      .header-subtitle { font-size: 0.875rem; gap: 0.5rem; }
+    }
 
     .header-actions {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       width: 100%;
+      justify-content: space-between;
     }
-    @media (min-width: 768px) { .header-actions { width: auto; gap: 1rem; } }
+    @media (min-width: 768px) {
+      .header-actions { width: auto; justify-content: flex-end; gap: 0.75rem;}
+    }
 
-    .badge-alert {
-      background: var(--badge-alert-bg);
-      color: var(--badge-alert-text);
-      border: 1px solid var(--badge-alert-border);
-      padding: 0.375rem 0.75rem;
+    /* Section Selector */
+    .section-select {
+      appearance: none;
+      background-color: var(--card-front-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
       border-radius: 0.5rem;
+      padding: 0.5rem 2rem 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%2364748b" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 1.25rem;
+      outline: none;
+      max-width: 220px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    .section-select:hover { border-color: var(--accent); }
+    @media (min-width: 768px) {
+      .section-select { max-width: 300px; font-size: 0.95rem; }
+    }
+
+    .icon { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
+    .icon-sm { width: 1rem; height: 1rem; }
+    .icon-lg { width: 1.75rem; height: 1.75rem; }
+    .text-success { color: var(--success); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-color);
+      background: var(--card-front-bg);
+      color: var(--text-main);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover { border-color: var(--accent); }
+    .btn-icon { padding: 0.5rem; border-radius: 0.5rem; }
+    
+    .btn.btn-blue {
+      background-color: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+    .btn.btn-blue:hover {
+      background-color: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    /* Tabs */
+    .tabs-wrapper {
+      width: 100%;
+      max-width: 800px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      margin-bottom: 1rem;
+      flex-shrink: 0;
+    }
+    .tabs-wrapper::-webkit-scrollbar { display: none; }
+    @media (min-width: 768px) {
+      .tabs-wrapper { margin-bottom: 1.5rem; }
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .tab {
+      white-space: nowrap;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      background: var(--card-front-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    #main-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-grow: 1;
+      justify-content: flex-start;
+      min-height: 0;
+    }
+
+    .status-text {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    /* Card */
+    .card-wrapper {
+      width: 100%;
+      max-width: 600px;
+      flex: 1 1 auto;
+      min-height: 200px;
+      max-height: 320px;
+      perspective: 1000px;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+      user-select: none;
+      will-change: transform;
+      -webkit-tap-highlight-color: transparent;
+    }
+    @media (min-width: 768px) { 
+      .card-wrapper { 
+        max-height: 384px; 
+        margin-bottom: 2rem;
+      } 
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+      box-shadow: 0 10px 25px var(--shadow-color);
+      border-radius: 1rem;
+    }
+    .card-wrapper.flipped .card-inner { transform: rotateX(180deg); }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1rem; 
+      border-radius: 1rem;
+      border-top: 4px solid;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain; 
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) transparent;
+    }
+    @media (min-width: 768px) {
+      .card-face { padding: 4rem 1.5rem; }
+    }
+
+    .card-face::before { content: ""; margin-top: auto; }
+    .card-face::after { content: ""; margin-bottom: auto; }
+    .card-face::-webkit-scrollbar { width: 6px; }
+    .card-face::-webkit-scrollbar-track { background: transparent; }
+    .card-face::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
+
+    .card-front {
+      background: var(--card-front-bg);
+      border-top-color: var(--accent);
+    }
+    .card-back {
+      background: var(--card-back-bg);
+      border-top-color: var(--success);
+      transform: rotateX(180deg);
+    }
+
+    .card-label {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .card-front .card-label { color: var(--accent); }
+    .card-back .card-label { color: var(--success); }
+
+    .card-content { 
+      font-size: 1.15rem; 
+      font-weight: 600; 
+      line-height: 1.5; 
+      width: 100%;
+      text-align: center;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      flex-shrink: 0; 
+      margin: 0;
+    }
+    @media (min-width: 768px) { .card-content { font-size: 1.5rem; } }
+    .card-back .card-content { font-weight: 500; color: var(--text-main); }
+
+    .card-hint {
+      position: absolute;
+      bottom: 1rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      animation: pulse 2s infinite;
+    }
+
+    .swipe-badge {
+      position: absolute;
+      top: 2rem;
+      padding: 0.5rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 800;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      letter-spacing: 0.1em;
+    }
+    .swipe-badge-left { right: 2rem; color: #ef4444; border: 4px solid #ef4444; transform: rotate(15deg); }
+    .swipe-badge-right { left: 2rem; color: #10b981; border: 4px solid #10b981; transform: rotate(-15deg); }
+
+    .card-topic-hint {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border-color);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.875rem;
-      font-weight: 600;
       width: 100%;
-      box-sizing: border-box;
-    }
-    @media (min-width: 768px) { .badge-alert { padding: 0.5rem 1rem; font-size: 1rem; width: auto; } }
-
-    .theme-btn {
+      justify-content: center;
+      text-align: center;
       flex-shrink: 0;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      color: var(--text-muted);
-      padding: 0.5rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+      margin-bottom: 0.5rem;
+    }
+    @media (min-width: 768px) { .controls { gap: 1.5rem; margin-bottom: 1rem; } }
+
+    .btn-control {
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    .theme-btn:hover {
-      color: var(--text-main);
-      background: var(--tab-bg-hover);
-    }
-
-    /* Вкладки */
-    .tabs-wrapper {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 0.5rem;
-      overflow-x: auto;
-      padding-bottom: 0.5rem;
-      margin-bottom: 0.25rem;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-    .tabs-wrapper::-webkit-scrollbar { display: none; }
-    @media (min-width: 768px) { .tabs-wrapper { flex-wrap: wrap; overflow-x: visible; padding-bottom: 0; margin-bottom: 0.5rem; } }
-
-    .tab-btn {
-      flex-shrink: 0;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.375rem;
-      padding: 0.375rem 0.75rem;
-      border-radius: 0.5rem;
-      font-weight: 500;
-      font-size: 0.875rem;
-      cursor: pointer;
-      background: var(--card-bg);
-      color: var(--text-muted);
+      border-radius: 50%;
       border: 1px solid var(--border-color);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-      font-family: inherit;
+      background: var(--card-front-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
     }
-    @media (min-width: 768px) { .tab-btn { gap: 0.5rem; padding: 0.5rem 1rem; font-size: 1rem; } }
-    .tab-btn:hover { background: var(--tab-bg-hover); color: var(--text-main); }
-    .tab-btn.active {
-      background: var(--blue-main);
-      color: #ffffff;
-      border-color: var(--blue-main);
-      box-shadow: 0 4px 6px -1px rgba(37,99,235,0.3);
+    .btn-control:hover { transform: scale(1.05); border-color: var(--accent); }
+
+    .btn-nav { width: 3rem; height: 3rem; }
+    .btn-action { width: 3rem; height: 3rem; color: var(--text-muted); }
+    .btn-action.active { background: var(--success); color: #fff; border-color: var(--success); }
+
+    .btn-main {
+      width: 3.5rem; height: 3.5rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 10px var(--shadow-color);
+    }
+    .btn-main:hover { background: var(--accent-hover); }
+    @media (min-width: 768px) {
+      .btn-nav, .btn-action { width: 3.5rem; height: 3.5rem; }
+      .btn-main { width: 4rem; height: 4rem; }
     }
 
-    /* Главная область */
-    .main-board {
-      background: var(--board-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 0.75rem;
-      padding: 1rem;
-      border: 1px solid var(--board-border);
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
-      min-height: 400px;
-      box-sizing: border-box;
-    }
-    @media (min-width: 768px) { .main-board { border-radius: 1rem; padding: 1.5rem; min-height: 500px; } }
-
-    /* Карточки */
-    .grid-3 { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
-    @media (min-width: 768px) { .grid-3 { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; } }
-    
-    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-    @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; } }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 0.75rem;
-      padding: 1rem;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-      position: relative;
-      overflow: hidden;
-    }
-    @media (min-width: 768px) { .card { padding: 1.5rem; } }
-    .card:hover { box-shadow: 0 4px 6px -1px var(--card-shadow-hover); }
-
-    .card-grad-indigo { background: var(--grad-indigo); border-color: var(--border-color); }
-    .card-grad-amber { background: var(--grad-amber); border-color: var(--border-color); }
-
-    .card-future-green { border-color: var(--card-green-border); }
-    .card-future-red { border-color: var(--card-red-border); }
-
-    /* Текст */
-    .flex-between { display: flex; justify-content: space-between; align-items: flex-start; }
-    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-    .text-xs { font-size: 0.75rem; line-height: 1rem; }
-    .font-bold { font-weight: 700; }
-    .font-black { font-weight: 900; }
-    .mt-1 { margin-top: 0.25rem; } .mt-2 { margin-top: 0.5rem; } .mt-4 { margin-top: 1rem; }
-    .mb-2 { margin-bottom: 0.5rem; } .mb-4 { margin-bottom: 1rem; }
-    .truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .color-red { color: #dc2626; }
-    .color-blue { color: #2563eb; }
-    .color-orange { color: #f97316; }
-    .color-green { color: #16a34a; }
-    .color-indigo { color: #4f46e5; }
-    .color-amber { color: #f59e0b; }
-    .color-pink { color: #ec4899; }
-    .color-muted { color: var(--text-muted); }
-    .color-light { color: var(--text-light); }
-
-    .big-num { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0.25rem 0; line-height: 1.2; }
-    @media (min-width: 768px) { .big-num { font-size: 1.875rem; margin: 0.5rem 0; } }
-    
-    .xl-num { font-size: 1.875rem; font-weight: 900; color: var(--text-main); margin-bottom: 0.75rem; }
-    @media (min-width: 768px) { .xl-num { font-size: 2.25rem; margin-bottom: 1rem; } }
-
-    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
-    @media (min-width: 768px) { .card-title { font-size: 1.125rem; margin-bottom: 0.75rem; } }
-    .title-no-border { border: none; margin-bottom: 0; padding-bottom: 0; }
-
-    /* Прогресс бары */
-    .progress-track { width: 100%; background: var(--progress-bg); border-radius: 9999px; height: 0.75rem; margin-top: 0.25rem; }
-    @media (min-width: 768px) { .progress-track { height: 1rem; } }
-    .progress-fill { height: 100%; border-radius: 9999px; }
-    .fill-red { background-color: #ef4444; }
-    .fill-orange { background-color: #fb923c; }
-    .fill-blue { background-color: #3b82f6; }
-
-    /* Alerts */
-    .alert-box { padding: 1rem; border-radius: 0.75rem; margin-top: 1rem; box-sizing: border-box; }
-    @media (min-width: 768px) { .alert-box { padding: 1.5rem; margin-top: 1.5rem; } }
-    
-    .alert-blue { background: var(--alert-blue-bg); border: 1px solid var(--alert-blue-border); color: var(--alert-blue-text); }
-    .alert-orange { background: var(--alert-orange-bg); border: 1px solid var(--alert-orange-border); color: var(--alert-orange-text); }
-    .alert-slate { background: var(--alert-slate-bg); border: 1px solid var(--alert-slate-border); color: var(--text-main); }
-    
-    .alert-title { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; margin-bottom: 0.5rem; font-size: 1.125rem;}
-
-    /* Списки */
-    .feature-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.375rem; }
-    @media (min-width: 768px) { .feature-list { gap: 0.5rem; } }
-    .feature-list li { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.75rem; color: var(--text-muted); }
-    @media (min-width: 768px) { .feature-list li { align-items: center; font-size: 0.875rem; } }
-
-    /* Блок Противостояния (VS) */
-    .vs-container { display: flex; align-items: center; justify-content: center; margin: -0.5rem 0; z-index: 10; position: relative; }
-    @media (min-width: 768px) { .vs-container { margin: 0; } }
-    .vs-line-v { width: 1px; height: 1.5rem; background: var(--vs-line); display: block; }
-    @media (min-width: 768px) { .vs-line-v { display: none; } }
-    .vs-line-h { height: 1px; width: 3rem; background: var(--vs-line); display: none; }
-    @media (min-width: 768px) { .vs-line-h { display: block; } }
-    .vs-badge { background: var(--card-bg); border: 1px solid var(--border-color); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; color: var(--text-light); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-    @media (min-width: 768px) { .vs-badge { padding: 0.5rem 1rem; font-size: 0.875rem; } }
-
-    /* Иконки и Анимации */
-    svg { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
-    .icon-sm { width: 1rem; height: 1rem; }
-    .icon-lg { width: 1.5rem; height: 1.5rem; }
-    @media (min-width: 768px) { .icon-lg { width: 2rem; height: 2rem; } }
-    .icon-bg { position: absolute; top: 0; right: 0; padding: 1rem; opacity: var(--icon-bg-opacity); width: 4rem; height: 4rem; pointer-events: none; }
-    @media (min-width: 768px) { .icon-bg { width: 6rem; height: 6rem; } }
-
-    .hidden-tab { display: none; }
-    .animate-in { animation: fadeIn 0.5s ease-out forwards; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .empty-state {
+      padding: 3rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.125rem;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <!-- Библиотека встраиваемых SVG иконок -->
   <svg style="display: none;">
     <defs>
-      <symbol id="icon-shield-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/>
-      </symbol>
-      <symbol id="icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-      </symbol>
-      <symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/>
-      </symbol>
-      <symbol id="icon-bar-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>
-      </symbol>
-      <symbol id="icon-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>
-      </symbol>
-      <symbol id="icon-brain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 4.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0-1.32 4.24 3 3 0 0 0 .34 5.58 2.5 2.5 0 0 0 2.96 3.08 2.5 2.5 0 0 0 4.91.05L12 20V4.5Z"/><path d="M16 8V5c0-1.1.9-2 2-2"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/>
-      </symbol>
-      <symbol id="icon-trending-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>
-      </symbol>
-      <symbol id="icon-swords" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="10"/><line x1="4" y1="16" x2="8" y2="20"/><line x1="3" y1="19" x2="5" y2="21"/>
-      </symbol>
-      <symbol id="icon-skull" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="M12.5 17-.5-1-1.5 1"/><path d="M16 20a2 2 0 0 0 1.56-2.25C18.2 14.54 20 12.83 20 10.5a8 8 0 1 0-16 0c0 2.33 1.8 4.04 2.44 7.25A2 2 0 0 0 8 20"/>
-      </symbol>
-      <symbol id="icon-heart-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/>
-      </symbol>
-      <symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </symbol>
       <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
       </symbol>
       <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </symbol>
+      <symbol id="icon-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </symbol>
+      <symbol id="icon-shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="16 3 21 3 21 8"></polyline>
+        <line x1="4" y1="20" x2="21" y2="3"></line>
+        <polyline points="21 16 21 21 16 21"></polyline>
+        <line x1="15" y1="15" x2="21" y2="21"></line>
+        <line x1="4" y1="4" x2="9" y2="9"></line>
+      </symbol>
+      <symbol id="icon-prev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </symbol>
+      <symbol id="icon-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </symbol>
+      <symbol id="icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </symbol>
+      <symbol id="icon-maximize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+      </symbol>
+      <symbol id="icon-minimize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
       </symbol>
     </defs>
   </svg>
 
-  <!-- Фоновые слои -->
-  <div id="bg-layer" class="bg-layer"></div>
-  <div class="bg-overlay"></div>
+  <div class="start-screen-overlay" id="start-screen">
+    <h1 class="start-title">ЕГЭ Обществознание</h1>
+    <p class="start-subtitle">Интерактивные карточки (558 шт.)</p>
+    <button class="btn-start" id="btn-big-start">Начать</button>
+  </div>
 
-  <!-- Основной контейнер -->
-  <div class="container">
-    
-    <!-- Заголовок -->
-    <header class="header">
+  <div class="app-container" id="app-container">
+    <div class="header">
       <div>
-        <h1>
-          <svg class="icon-lg color-red"><use href="#icon-shield-alert"/></svg>
-          Прогноз развития мира
-        </h1>
-        <p>интерактивная панель на основе тезисов Андрея Фурсова</p>
+        <h1 class="header-title">Обществознание</h1>
+        <p class="header-subtitle" id="header-subtitle">
+          <svg class="icon icon-sm text-success"><use href="#icon-check-circle"></use></svg>
+          <span id="file-status-text">База загружается...</span>
+        </p>
       </div>
       
       <div class="header-actions">
-        <div class="badge-alert">
-          <svg class="icon-sm"><use href="#icon-zap"/></svg>
-          <span class="truncate">Текущая фаза: вход в Темновековье</span>
-        </div>
-        <button id="theme-toggle" class="theme-btn" onclick="toggleTheme()" aria-label="Переключить тему">
-          <svg id="sun-icon" style="display: none;"><use href="#icon-sun"/></svg>
-          <svg id="moon-icon" style="display: none;"><use href="#icon-moon"/></svg>
-        </button>
-      </div>
-    </header>
+        <!-- Селектор разделов -->
+        <select id="section-selector" class="section-select">
+          <option value="s1">Раздел 1. Человек и общество</option>
+          <option value="s2">Раздел 2. Социальные отношения</option>
+          <option value="s3_1">Раздел 3. Экономика (Часть 1)</option>
+          <option value="s3_2">Раздел 3. Экономика (Часть 2)</option>
+          <option value="s4_1">Раздел 4. Политика (Часть 1)</option>
+          <option value="s4_2">Раздел 4. Политика (Часть 2)</option>
+          <option value="s5_1">Раздел 5. Право (Часть 1)</option>
+          <option value="s5_2">Раздел 5. Право (Часть 2)</option>
+        </select>
 
-    <!-- Навигация (Вкладки) -->
-    <div class="tabs-wrapper" id="tabs-container">
-      <button onclick="switchTab('overview')" id="btn-overview" class="tab-btn active">
-        <svg><use href="#icon-globe"/></svg> Сводка
-      </button>
-      <button onclick="switchTab('elites')" id="btn-elites" class="tab-btn">
-        <svg><use href="#icon-bar-chart"/></svg> Элиты и Экономика
-      </button>
-      <button onclick="switchTab('geopolitics')" id="btn-geopolitics" class="tab-btn">
-        <svg><use href="#icon-map"/></svg> Геополитика
-      </button>
-      <button onclick="switchTab('future')" id="btn-future" class="tab-btn">
-        <svg><use href="#icon-brain"/></svg> Будущее
-      </button>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-icon" id="btn-theme" title="Переключить тему">
+            <svg class="icon"><use id="theme-icon-use" href="#icon-moon"></use></svg>
+          </button>
+          <button class="btn btn-icon btn-blue" id="btn-fullscreen" title="Полноэкранный режим">
+            <svg class="icon"><use id="fullscreen-icon-use" href="#icon-maximize"></use></svg>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Область контента -->
-    <main class="main-board">
-      
-      <!-- Вкладка: СВОДКА -->
-      <div id="tab-overview" class="tab-content animate-in">
-        <div class="grid-3">
-          <div class="card">
-            <div class="flex-between">
-              <span class="text-sm color-light font-bold">Период турбулентности</span>
-              <svg class="color-blue"><use href="#icon-globe"/></svg>
-            </div>
-            <div class="big-num">60–70 лет</div>
-            <p class="text-xs color-muted mt-1">эпоха «войномира», где стерта грань между войной и миром.</p>
-          </div>
-          <div class="card">
-            <div class="flex-between">
-              <span class="text-sm color-light font-bold">Главная мишень</span>
-              <svg class="color-orange"><use href="#icon-trending-down"/></svg>
-            </div>
-            <div class="big-num">Средний класс</div>
-            <p class="text-xs color-muted mt-1">экспроприация активов при переходе к посткапитализму.</p>
-          </div>
-          <div class="card">
-            <div class="flex-between">
-              <span class="text-sm color-light font-bold">Историческая аналогия</span>
-              <svg class="color-red"><use href="#icon-swords"/></svg>
-            </div>
-            <div class="big-num" style="font-size: 1.25rem;">Тридцатилетняя война 2.0</div>
-            <p class="text-xs color-muted mt-1">рождение новой системы через серию локальных конфликтов.</p>
-          </div>
-        </div>
-        <div class="alert-box alert-blue">
-          <div class="alert-title">
-            <svg><use href="#icon-shield-alert"/></svg> Ключевой тезис
-          </div>
-          <p class="text-sm" style="line-height: 1.6; margin: 0;">
-            Стабильность (как в 1945–1991 годах) – это историческая аномалия. Мы входим в фазу жесткого слома старой системы, где новые социальные структуры появляются в откровенно криминальном или гибридном виде. Испугаться не стоит: пугаться стыдно и поздно.
-          </p>
-        </div>
+    <div class="tabs-wrapper">
+      <div class="tabs" id="tabs-container">
+        <button class="tab active" data-tab="all" id="tab-all">Все термины (0)</button>
+        <button class="tab" data-tab="learning" id="tab-learning">Осталось выучить (0)</button>
+        <button class="tab" data-tab="learned" id="tab-learned">Выученные (0)</button>
       </div>
+    </div>
 
-      <!-- Вкладка: ЭЛИТЫ И ЭКОНОМИКА -->
-      <div id="tab-elites" class="tab-content hidden-tab animate-in">
-        <div class="card" style="margin-bottom: 1.5rem;">
-          <h3 class="card-title title-no-border" style="color: var(--text-main); margin-bottom: 1rem;">Структура мирового богатства (активы ~90 трлн $)</h3>
-          <div>
-            <div class="flex-between text-xs mb-2">
-              <span class="color-muted">1% населения (Мировая элита)</span>
-              <span class="font-bold color-red">35 трлн $ (39%)</span>
-            </div>
-            <div class="progress-track"><div class="progress-fill fill-red" style="width: 39%"></div></div>
-          </div>
-          <div class="mt-4">
-            <div class="flex-between text-xs mb-2">
-              <span class="color-muted">12–15% населения (Средний класс)</span>
-              <span class="font-bold color-orange">40 трлн $ (44%)</span>
-            </div>
-            <div class="progress-track"><div class="progress-fill fill-orange" style="width: 44%"></div></div>
-            <p class="text-xs color-light mt-2" style="font-style: italic;">цель элиты: отобрать эти ресурсы, так как в новом мире среднего класса быть не должно.</p>
-          </div>
-          <div class="mt-4">
-            <div class="flex-between text-xs mb-2">
-              <span class="color-muted">85% населения (Остальной мир)</span>
-              <span class="font-bold color-blue">15 трлн $ (17%)</span>
-            </div>
-            <div class="progress-track"><div class="progress-fill fill-blue" style="width: 17%"></div></div>
-          </div>
-        </div>
+    <div id="main-content">
+      <div class="status-text" id="status-text">Карточка 1 из 0</div>
 
-        <h3 class="card-title title-no-border" style="margin-bottom: 1rem;">Схватка проектов будущего</h3>
-        <div class="grid-2">
-          <div class="card card-grad-indigo">
-            <div class="alert-title color-indigo" style="margin-bottom: 1rem;">
-              <svg><use href="#icon-skull"/></svg> Ультраглобалисты
-            </div>
-            <ul class="feature-list">
-              <li><strong class="color-indigo">Лидеры:</strong> Шваб, Харари (проект «Чужой»).</li>
-              <li><strong class="color-indigo">Суть:</strong> био-эко-фашизм.</li>
-              <li><strong class="color-indigo">Цель:</strong> изменение биологической природы человека, сокращение населения.</li>
-              <li><strong class="color-indigo">Методы:</strong> пандемии, медицинский контроль, разрушение государств в пользу мегакорпораций.</li>
-            </ul>
+      <div class="card-wrapper" id="card-wrapper">
+        <div class="swipe-badge swipe-badge-left" id="badge-left">Повторить</div>
+        <div class="swipe-badge swipe-badge-right" id="badge-right">Выучил</div>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <span class="card-label">Вопрос</span>
+            <h2 class="card-content" id="card-question"></h2>
+            <p class="card-hint">Нажмите, чтобы перевернуть</p>
           </div>
-          <div class="card card-grad-amber">
-            <div class="alert-title color-amber" style="margin-bottom: 1rem;">
-              <svg><use href="#icon-zap"/></svg> Трамписты (Промышленники)
-            </div>
-            <ul class="feature-list">
-              <li><strong class="color-amber">Лидеры:</strong> Трамп, Маск (проект «Хищник»).</li>
-              <li><strong class="color-amber">Суть:</strong> техно-фашизм.</li>
-              <li><strong class="color-amber">Цель:</strong> создание макрозон во главе с Северной Америкой (технат).</li>
-              <li><strong class="color-amber">Методы:</strong> технический контроль над населением, сохранение промышленности и жесткой иерархии.</li>
-            </ul>
+          <div class="card-face card-back">
+            <span class="card-label">Ответ</span>
+            <p class="card-content" id="card-answer"></p>
+            <div class="card-topic-hint" id="card-topic-hint"></div>
           </div>
         </div>
       </div>
 
-      <!-- Вкладка: ГЕОПОЛИТИКА -->
-      <div id="tab-geopolitics" class="tab-content hidden-tab animate-in">
-        <div class="grid-3">
-          <div class="card">
-            <h3 class="card-title color-red">Европа: жертва №1</h3>
-            <p class="text-sm color-muted" style="flex-grow: 1;">Западная Европа пошла «под нож» первой из-за политической слабости и огромных накоплений среднего класса.</p>
-            <div class="alert-box alert-slate" style="padding: 0.75rem; margin-top: 1rem;">
-              <strong style="display: block; margin-bottom: 0.25rem; font-size: 0.75rem;">Инструменты уничтожения:</strong>
-              <span class="text-xs color-muted">налоги, зеленая повестка, миграция (мигранты – это этническое оружие).</span>
-            </div>
-          </div>
-          <div class="card">
-            <h3 class="card-title color-amber">Украина: таран</h3>
-            <p class="text-sm color-muted" style="flex-grow: 1;">Используется англосаксами для ослабления Европы (отсечение от дешевых ресурсов РФ) и оттока капиталов в США.</p>
-            <div class="alert-box alert-slate" style="padding: 0.75rem; margin-top: 1rem;">
-              <strong style="display: block; margin-bottom: 0.25rem; font-size: 0.75rem;">Итог:</strong>
-              <span class="text-xs color-muted">стравливание двух славянских народов для решения западных экономических проблем и уменьшения населения.</span>
-            </div>
-          </div>
-          <div class="card">
-            <h3 class="card-title color-green">Россия: стратегия</h3>
-            <p class="text-sm color-muted" style="flex-grow: 1;">Интерес РФ – в разрушении Евросоюза (наследника проекта Гитлера) и выстраивании двусторонних отношений со странами.</p>
-            <div class="alert-box alert-slate" style="padding: 0.75rem; margin-top: 1rem;">
-              <strong style="display: block; margin-bottom: 0.25rem; font-size: 0.75rem;">Причины устойчивости:</strong>
-              <span class="text-xs color-muted">высокий болевой порог общества, спасительные неформальные связи и смекалка (адаптивность).</span>
-            </div>
-          </div>
-        </div>
-        <div class="alert-box alert-slate mt-4">
-          <div class="alert-title" style="font-size: 1rem;">
-            <svg class="color-light"><use href="#icon-map"/></svg> Британия против США
-          </div>
-          <p class="text-sm color-muted" style="margin: 0;">Внутри «англосаксонского единства» идет жесточайшая борьба. Британская элита пытается создать «Глобальную Британию» и вернуть контроль над США в рамках наднационального класса, беря реванш за разрушение Британской империи американцами в 1956 году.</p>
-        </div>
+      <div class="controls" id="controls">
+        <button class="btn-control btn-action" id="btn-shuffle" title="Перемешать все">
+          <svg class="icon"><use href="#icon-shuffle"></use></svg>
+        </button>
+        <button class="btn-control btn-nav" id="btn-prev" title="Предыдущая">
+          <svg class="icon"><use href="#icon-prev"></use></svg>
+        </button>
+        <button class="btn-control btn-main" id="btn-next" title="Следующая">
+          <svg class="icon icon-lg"><use href="#icon-next"></use></svg>
+        </button>
+        <button class="btn-control btn-action" id="btn-check" title="Отметить как выученное">
+          <svg class="icon"><use href="#icon-check"></use></svg>
+        </button>
       </div>
+    </div>
 
-      <!-- Вкладка: БУДУЩЕЕ -->
-      <div id="tab-future" class="tab-content hidden-tab animate-in">
-        <div style="text-align: center; max-width: 42rem; margin: 0 auto 2rem auto;">
-          <svg class="color-pink" style="width: 3rem; height: 3rem; margin-bottom: 1rem;"><use href="#icon-heart-pulse"/></svg>
-          <h2 style="font-size: 1.5rem; font-weight: 700; margin: 0 0 0.5rem 0;">Антропологический переход</h2>
-          <p class="text-sm color-light" style="margin: 0;">Главная угроза – разделение человечества на два биологических вида (концепция Института Санта-Фе, 2018 год).</p>
-        </div>
-        
-        <div style="display: flex; flex-direction: column; gap: 1rem; position: relative;">
-          <!-- ПК раскладка "Будущего" -->
-          <style>
-            .future-grid { display: flex; flex-direction: column; gap: 1rem; }
-            @media (min-width: 768px) { .future-grid { flex-direction: row; gap: 1.5rem; align-items: stretch; } }
-            .future-card { flex: 1; }
-          </style>
-
-          <div class="future-grid">
-            <div class="card future-card card-future-green">
-              <svg class="icon-bg color-green"><use href="#icon-users"/></svg>
-              <h3 class="card-title title-no-border color-green">Каста «Верхов»</h3>
-              <div class="xl-num">120–140 <span style="font-size: 1rem; font-weight: 400; color: var(--text-light);">лет жизни</span></div>
-              <ul class="feature-list">
-                <li><span class="color-green font-bold">✓</span> проживание в экологически чистых анклавах;</li>
-                <li><span class="color-green font-bold">✓</span> натуральное органическое питание;</li>
-                <li><span class="color-green font-bold">✓</span> доступ к передовой биотехнологической медицине.</li>
-              </ul>
-            </div>
-            
-            <div class="vs-container">
-              <div class="vs-line-v"></div>
-              <div class="vs-line-h"></div>
-              <div class="vs-badge">ПРОТИВ</div>
-              <div class="vs-line-v"></div>
-              <div class="vs-line-h"></div>
-            </div>
-
-            <div class="card future-card card-future-red">
-              <svg class="icon-bg color-red"><use href="#icon-skull"/></svg>
-              <h3 class="card-title title-no-border color-red">Каста «Низов»</h3>
-              <div class="xl-num">40–60 <span style="font-size: 1rem; font-weight: 400; color: var(--text-light);">лет жизни</span></div>
-              <ul class="feature-list">
-                <li><span class="color-red font-bold">×</span> жизнь в условиях виртуальной реальности (метавселенные);</li>
-                <li><span class="color-red font-bold">×</span> синтетическая еда;</li>
-                <li><span class="color-red font-bold">×</span> постоянная вакцинация и медицинский контроль «Биг Фармы».</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="alert-box alert-orange">
-          <p class="text-sm" style="text-align: center; margin: 0; line-height: 1.6;">
-            <strong>Суть борьбы сегодня:</strong> это уже не просто классовая или геополитическая схватка. Это сопротивление плану ультраглобалистов ради того, чтобы человек просто остался человеком, сохранив свою биологическую независимость. Чем больше сопротивления сейчас (саботаж, отказ от «новой нормальности»), тем мягче будет посткапиталистический строй в будущем.
-          </p>
-        </div>
-      </div>
-
-    </main>
+    <div class="empty-state" id="empty-state">
+      В этой категории пока нет карточек.
+    </div>
   </div>
 
   <script>
-    // Управление темами
-    function initTheme() {
-      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-      updateThemeIcon(currentTheme);
+    // Жесткая блокировка системного скролла
+    document.addEventListener('touchmove', function(e) {
+      const isScrollable = e.target.closest('.card-face, .tabs-wrapper');
+      if (!isScrollable) {
+        if (e.cancelable) e.preventDefault();
+      }
+    }, { passive: false });
+
+    // Полная структурированная база (558 карточек)
+    const rawData = {
+      "s1": [
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Что такое общество в широком смысле слова?", "Это обособившаяся от природы, но тесно с ней связанная часть материального мира, включающая способы взаимодействия и формы объединения людей."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Из каких двух основных частей состоит окружающий нас материальный мир?", "Материальный мир состоит из природы и общества."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Как называется признак общества, выражающийся в его постоянном изменении и развитии под влиянием различных факторов?", "Динамичность."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "В чем проявляется такая характеристика общества, как «открытость»?", "В способности общества обмениваться информацией, ресурсами и культурными достижениями с внешней средой."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Как называется признак общества, означающий, что оно состоит из взаимосвязанных элементов (институтов, групп), образующих единую структуру?", "Системность."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Назовите основной способ ведения хозяйства в первобытном обществе.", "Охота, собирательство и натуральное хозяйство."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Каков основной регулятор общественных отношений в традиционном обществе?", "Традиции и обычаи, передающиеся из поколения в поколение."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Для какого типа общества характерна низкая социальная мобильность и преобладание аграрного уклада?", "Традиционное общество."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Что является экономической основой индустриального общества?", "Промышленный способ производства и массовое применение машинного труда."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Какой ресурс становится главным в постиндустриальном (информационном) обществе?", "Знания, информация и высокие технологии."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "В каком типе общества сфера услуг начинает играть ведущую роль, преобладая над производством товаров?", "В постиндустриальном (информационном) обществе."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Что такое природа в узком смысле?", "Весь материальный мир за исключением общества, естественная среда обитания человека."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Что такое социальный институт?", "Исторически сложившаяся устойчивая форма организации совместной деятельности людей, направленной на удовлетворение базовых потребностей."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Приведите примеры социальных институтов.", "Семья, государство, религия, образование, производство."],
+        ["Тема 1. ЧТО ТАКОЕ ОБЩЕСТВО", "Каковы основные функции социальных институтов?", "Удовлетворение потребностей, регуляция поведения, социализация, интеграция."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "Что такое общественный прогресс?", "Направление развития, для которого характерен переход от низшего к высшему, от простого к более сложному."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "Что такое общественный регресс?", "Направление развития от высшего к низшему, деградация, возврат к изжившим себя формам."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "Что такое эволюция?", "Постепенные, плавные изменения в обществе, не приводящие к быстрому качественному скачку."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "Что такое революция?", "Коренные, скачкообразные изменения всех или большинства сторон общественной жизни."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "Что такое реформа?", "Целенаправленное преобразование какой-либо стороны общественной жизни, проводимое государственной властью."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "В чем заключается противоречивость общественного прогресса?", "Развитие в одной сфере может сопровождаться деградацией в другой (например, рост технологий и ухудшение экологии)."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "Что такое глобализация?", "Процесс всемирной экономической, политической и культурной интеграции и унификации."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "Назовите позитивные последствия глобализации.", "Доступ к информации, объединение усилий для решения проблем, развитие международной торговли."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "Назовите негативные последствия глобализации.", "Утрата культурной специфики, зависимость экономик, рост разрыва между богатыми и бедными странами."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "Что такое глобальные проблемы?", "Совокупность проблем человечества, от решения которых зависит существование цивилизации."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "Назовите основные виды глобальных проблем.", "Экологические, демографические, угроза ядерной войны, международный терроризм, проблема «Север–Юг»."],
+        ["Тема 2. ОБЩЕСТВЕННЫЙ ПРОГРЕСС", "В чем проявляется проблема «Север–Юг»?", "В сильном экономическом разрыве между развитыми странами Севера и развивающимися странами Юга."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Кто такой индивид?", "Единичный представитель человеческого рода, носитель биологических качеств."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Что такое индивидуальность?", "Неповторимое своеобразие проявлений человека, подчеркивающее его исключительность."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Кто такой личность?", "Индивид, обладающий совокупностью социально значимых качеств, которые он реализует в общественной жизни."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Что такое социализация?", "Процесс усвоения индивидом социальных норм, культурных ценностей и образцов поведения общества."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Кто такие агенты социализации?", "Люди, социальные группы, учреждения и организации, ответственные за воспитание и обучение."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Приведите примеры агентов первичной социализации.", "Семья, близкие друзья, школьные учителя."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Приведите примеры агентов вторичной социализации.", "Администрация школы или университета, руководство на работе, государство, СМИ."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Что такое потребность?", "Переживаемая и осознаваемая человеком нужда в том, что необходимо для поддержания его организма и развития личности."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Какие выделяют три основные группы потребностей?", "Биологические (материальные), социальные, духовные (идеальные)."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Приведите примеры биологических потребностей.", "Пища, вода, сон, дыхание, тепло, самосохранение."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Приведите примеры социальных потребностей.", "Общение, труд, общественное признание, принадлежность к определенной группе."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Приведите примеры духовных потребностей.", "Познание, творчество, поиск смысла жизни, самореализация."],
+        ["Тема 3. ЧЕЛОВЕК, ИНДИВИД, ЛИЧНОСТЬ", "Что такое мнимые (ложные) потребности?", "Потребности, удовлетворение которых ведет к физической и духовной деградации личности (алкоголь, наркотики)."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое деятельность?", "Специфический вид человеческой активности, направленный на преобразование окружающего мира и самого себя."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Назовите основные структурные элементы деятельности.", "Субъект, объект, мотив, цель, средства, процесс, результат."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Кто такой субъект деятельности?", "Тот, кто осуществляет деятельность (человек, социальная группа, общество в целом)."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое объект деятельности?", "То, на что направлена деятельность (предметы, процессы, другие люди)."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое мотив деятельности?", "То, что побуждает человека к деятельности (потребности, интересы, убеждения, идеалы)."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое цель деятельности?", "Осознанный образ желаемого (предвосхищаемого) результата."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Назовите основные виды деятельности.", "Игра, учение (познание), труд, общение."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "В чем особенность игры как вида деятельности?", "Ориентация не на результат, а на сам процесс, наличие условной воображаемой ситуации и строгих правил."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Какова главная цель учения как вида деятельности?", "Приобретение человеком новых знаний, умений и навыков."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что отличает труд от других видов деятельности?", "Направленность на достижение практически полезного результата, создание материальных и духовных благ."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое общение?", "Вид деятельности, при котором происходит обмен информацией, идеями, эмоциями и оценками между людьми."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое познание?", "Процесс постижения действительности, накопления и осмысления данных, полученных в опыте взаимодействия человека с окружающим миром."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Назовите два уровня (этапа) познания.", "Чувственное и рациональное познание."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Каковы формы чувственного познания?", "Ощущение, восприятие, представление."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое ощущение?", "Отражение отдельных свойств предмета, воздействующего в данный момент на органы чувств."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое восприятие?", "Целостный чувственный образ предмета, воздействующего в данный момент на органы чувств."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое представление?", "Чувственно-наглядный образ предмета, сохраняемый в памяти без его непосредственного воздействия на органы чувств."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Каковы формы рационального познания?", "Понятие, суждение, умозаключение."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое понятие?", "Мысль, фиксирующая общие и существенные признаки вещей и явлений."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое суждение?", "Мысль, утверждающая или отрицающая что-либо об объекте познания."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое умозаключение?", "Мысленная связь нескольких суждений и выведение из них логическим путем нового суждения (вывода)."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Что такое истина?", "Знание, соответствующее свойствам познаваемого предмета, адекватное объективное отражение действительности."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "В чем разница между абсолютной и относительной истиной?", "Абсолютная – исчерпывающее, неизменное знание. Относительная – точное при определенных условиях, но ограниченное знание, которое может дополняться в будущем."],
+        ["Тема 4. ДЕЯТЕЛЬНОСТЬ ЧЕЛОВЕКА", "Назовите основной критерий истины.", "Общественная практика (опыт, эксперимент)."],
+        ["Тема 5. КУЛЬТУРА", "Что такое культура в широком смысле?", "Всё, что создано человечеством в период его жизнедеятельности, все виды преобразовательной деятельности и её результаты."],
+        ["Тема 5. КУЛЬТУРА", "На какие две формы делится культура по своему характеру?", "Материальная и духовная культура."],
+        ["Тема 5. КУЛЬТУРА", "Что относится к материальной культуре?", "Техника, здания, одежда, орудия труда (все осязаемые результаты деятельности)."],
+        ["Тема 5. КУЛЬТУРА", "Что относится к духовной культуре?", "Идеи, знания, верования, ценности, правила (все неосязаемые результаты деятельности)."],
+        ["Тема 5. КУЛЬТУРА", "Назовите три типа культуры по уровню аудитории.", "Элитарная, массовая, народная культура."],
+        ["Тема 5. КУЛЬТУРА", "Для какой культуры характерны анонимность творцов и устная передача из поколения в поколение?", "Для народной культуры."],
+        ["Тема 5. КУЛЬТУРА", "Какая культура ориентирована на коммерческий успех и стандартизацию?", "Массовая культура (поп-культура)."],
+        ["Тема 6. НАУКА", "Что такое наука?", "Это форма духовной культуры, направленная на выработку объективных, системно организованных и обоснованных знаний о природе, обществе и человеке."],
+        ["Тема 6. НАУКА", "Назовите основные функции науки.", "Познавательная, прогностическая, мировоззренческая и социальная."],
+        ["Тема 6. НАУКА", "Что отличает научное познание от других видов познания?", "Объективность, доказательность, системность, проверяемость и использование специального языка."],
+        ["Тема 6. НАУКА", "На какие виды делятся науки по предмету изучения?", "На естественные, точные (технические) и социально-гуманитарные."],
+        ["Тема 6. НАУКА", "На какие два уровня делится научное познание?", "На эмпирический (опытный) и теоретический уровни."],
+        ["Тема 7. ИСКУССТВО", "Что такое искусство?", "Это специфическая форма духовной культуры, представляющая собой отражение окружающей действительности в художественных образах."],
+        ["Тема 7. ИСКУССТВО", "Назовите главную особенность искусства.", "Субъективность восприятия, эмоциональность, образность и наглядность."],
+        ["Тема 7. ИСКУССТВО", "Перечислите основные функции искусства.", "Эстетическая, воспитательная, компенсаторная, познавательная и гедонистическая."],
+        ["Тема 7. ИСКУССТВО", "В чем заключается эстетическая функция искусства?", "В формировании вкуса и способности человека воспринимать, чувствовать и ценить прекрасное."],
+        ["Тема 7. ИСКУССТВО", "Что такое художественный образ?", "Это субъективное видение творцом какого-либо явления или предмета, выраженное средствами искусства."],
+        ["Тема 8. ОБРАЗОВАНИЕ", "Что такое образование?", "Это целенаправленный процесс воспитания и обучения в интересах человека, общества и государства."],
+        ["Тема 8. ОБРАЗОВАНИЕ", "Назовите основные тенденции развития современного образования.", "Гуманизация, гуманитаризация, информатизация и непрерывность."],
+        ["Тема 8. ОБРАЗОВАНИЕ", "В чем суть гуманизации образования?", "Во внимании к личности ученика, его здоровью, интересам и индивидуальным особенностям."],
+        ["Тема 8. ОБРАЗОВАНИЕ", "Какие уровни общего образования существуют в РФ?", "Дошкольное, начальное общее, основное общее и среднее общее образование."],
+        ["Тема 8. ОБРАЗОВАНИЕ", "Какова главная функция образования в обществе?", "Социализация личности и передача накопленного культурного опыта новым поколениям."],
+        ["Тема 9. МОРАЛЬ", "Что такое мораль?", "Специфический способ регулирования общественной жизни с позиций гуманизма, добра и справедливости."],
+        ["Тема 9. МОРАЛЬ", "Как звучит «золотое правило нравственности»?", "«Относись к другим людям так, как хочешь, чтобы они относились к тебе»."],
+        ["Тема 9. МОРАЛЬ", "Назовите три отличия морали от права.", "неписаный характер, создается обществом (а не государством), не имеет строгой юридической ответственности за нарушение."],
+        ["Тема 9. МОРАЛЬ", "В чем заключается оценочная функция морали?", "В способности давать характеристику поступкам людей с точки зрения добра и зла."],
+        ["Тема 9. МОРАЛЬ", "Что такое «социальные санкции»?", "Меры одобрения или порицания (позитивные и негативные), применяемые обществом для регуляции поведения индивида."],
+        ["Тема 10. РЕЛИГИЯ", "Дайте определение религии.", "Это форма духовной культуры и мировоззрение, основанное на вере в существование сверхъестественных сил."],
+        ["Тема 10. РЕЛИГИЯ", "Назовите три мировые религии.", "буддизм, христианство и ислам."],
+        ["Тема 10. РЕЛИГИЯ", "Чем монотеистические религии отличаются от политеистических?", "Монотеизм – это вера в одного Бога, политеизм – вера во многих богов."],
+        ["Тема 10. РЕЛИГИЯ", "Является ли буддизм монотеистической религией?", "Нет, буддизм не признает Бога-творца; Будда является духовным учителем, а не Богом."],
+        ["Тема 10. РЕЛИГИЯ", "В чем заключается компенсаторная функция религии?", "В оказании психологической помощи, дарении надежды и утешения в трудные моменты жизни."],
+        ["Тема 10. РЕЛИГИЯ", "Что такое «конфессия»?", "Это отдельное направление или школа внутри одной конкретной религии (например, православие, католицизм и протестантизм в христианстве)."]
+      ],
+      "s2": [
+        ["Тема 1. МИРОВОЗЗРЕНИЕ", "Что такое мировоззрение?", "Это целостное представление человека об обществе, природе и своем месте в мире."],
+        ["Тема 1. МИРОВОЗЗРЕНИЕ", "Назовите основные компоненты мировоззрения.", "К ним относятся: знания, ценности, убеждения, идеалы и нормы."],
+        ["Тема 1. МИРОВОЗЗРЕНИЕ", "Какова главная функция мировоззрения?", "Оно выступает жизненным ориентиром, задает цели и формирует систему ценностей."],
+        ["Тема 1. МИРОВОЗЗРЕНИЕ", "Что такое обыденное (житейское) мировоззрение?", "Это тип мировоззрения, основанный на личном практическом опыте и здравом смысле."],
+        ["Тема 1. МИРОВОЗЗРЕНИЕ", "Чем отличается теоретическое мировоззрение?", "Оно опирается на логику, научные знания и глубокий интеллектуальный анализ."],
+        ["Тема 1. МИРОВОЗЗРЕНИЕ", "В чем особенность мифологического мировоззрения?", "Это объяснение устройства мира через предания, сказания и веру в фантастических существ."],
+        ["Тема 1. МИРОВОЗЗРЕНИЕ", "На чем основано религиозное мировоззрение?", "На вере в существование сверхъестественных сил и строгом соблюдении догматов."],
+        ["Тема 1. МИРОВОЗЗРЕНИЕ", "Какова главная черта научного мировоззрения?", "Строгая опора на факты, доказательность, объективность и проверяемость."],
+        ["Тема 1. МИРОВОЗЗРЕНИЕ", "Что свойственно философскому мировоззрению?", "Рационально-теоретическое осмысление самых общих законов развития природы, общества и мышления."],
+        ["Тема 1. МИРОВОЗЗРЕНИЕ", "Что такое менталитет?", "Это совокупность умственных, эмоциональных и культурных особенностей, присущих определенной группе."],
+        ["Тема 2. СОЦИАЛЬНЫЕ ГРУППЫ", "Что такое социальная группа?", "Совокупность людей, имеющих общий социально значимый признак, общие интересы и ценности."],
+        ["Тема 2. СОЦИАЛЬНЫЕ ГРУППЫ", "Перечислите основные признаки социальной группы.", "К ним относятся: взаимодействие членов, признание своей принадлежности к группе и признание этого другими."],
+        ["Тема 2. СОЦИАЛЬНЫЕ ГРУППЫ", "Что такое первичная социальная группа?", "Это небольшая группа, где отношения носят тесный, эмоциональный и межличностный характер (например, семья)."],
+        ["Тема 2. СОЦИАЛЬНЫЕ ГРУППЫ", "В чем специфика вторичной социальной группы?", "Отношения в ней формальны и направлены на достижение конкретной цели (например, коллектив на работе)."],
+        ["Тема 2. СОЦИАЛЬНЫЕ ГРУППЫ", "Чем формальная группа отличается от неформальной?", "Формальная создается на базе официальных документов, а неформальная – на основе личных симпатий."],
+        ["Тема 2. СОЦИАЛЬНЫЕ ГРУППЫ", "Что такое номинальная социальная группа?", "Искусственно выделенная для статистического учета категория людей (например, пассажиры поездов)."],
+        ["Тема 2. СОЦИАЛЬНЫЕ ГРУППЫ", "Что такое реальная социальная группа?", "Объединение людей, осознающих свою принадлежность к группе и реально взаимодействующих между собой."],
+        ["Тема 2. СОЦИАЛЬНЫЕ ГРУППЫ", "Кто такая молодежь с точки зрения социологии?", "Социально-демографическая группа, выделяемая на основе возрастных характеристик и особенностей социального положения."],
+        ["Тема 2. СОЦИАЛЬНЫЕ ГРУППЫ", "Назовите типичные черты молодежи.", "Переходность положения, высокий уровень социальной мобильности, активный поиск своего места в жизни."],
+        ["Тема 2. СОЦИАЛЬНЫЕ ГРУППЫ", "Что такое молодежная субкультура?", "Культура молодого поколения, отличающаяся своими ценностями, сленгом, модой и стилем поведения."],
+        ["Тема 3. СОЦИАЛЬНЫЙ КОНФЛИКТ", "Что такое социальный конфликт?", "Это высшая стадия развития противоречий в отношениях между людьми, социальными группами или обществом в целом."],
+        ["Тема 3. СОЦИАЛЬНЫЙ КОНФЛИКТ", "Кого называют субъектами социального конфликта?", "Непосредственных участников (индивиды или группы), между которыми возникло столкновение."],
+        ["Тема 3. СОЦИАЛЬНЫЙ КОНФЛИКТ", "Что такое предмет социального конфликта?", "Конкретное материальное или духовное благо, из-за которого началось противостояние."],
+        ["Тема 3. СОЦИАЛЬНЫЙ КОНФЛИКТ", "Чем повод конфликта отличается от причины?", "Повод – это конкретное событие (искра), а причина – глубокие объективные противоречия."],
+        ["Тема 3. СОЦИАЛЬНЫЙ КОНФЛИКТ", "Назовите основные стадии социального конфликта.", "Предконфликтная стадия, сам конфликт и разрешение конфликта."],
+        ["Тема 3. СОЦИАЛЬНЫЙ КОНФЛИКТ", "В чем заключается разрешение конфликта путем компромисса?", "В решении проблемы через взаимные уступки сторон."],
+        ["Тема 3. СОЦИАЛЬНЫЙ КОНФЛИКТ", "Что такое переговоры как способ разрешения конфликта?", "Мирное обсуждение проблемы сторонами для поиска взаимоприемлемого решения."],
+        ["Тема 3. СОЦИАЛЬНЫЙ КОНФЛИКТ", "В чем суть посредничества (медиации)?", "Привлечение третьей, нейтральной стороны для помощи в разрешении спора без вынесения обязательного решения."],
+        ["Тема 3. СОЦИАЛЬНЫЙ КОНФЛИКТ", "Что такое арбитраж в социальном конфликте?", "Обращение к специальному органу власти, решение которого обязательно для исполнения всеми сторонами."],
+        ["Тема 3. СОЦИАЛЬНЫЙ КОНФЛИКТ", "Какие функции может выполнять социальный конфликт?", "Позитивные (обновление, выявление проблем) и негативные (разрушение, стресс)."],
+        ["Тема 4. СВОБОДА И ОТВЕТСТВЕННОСТЬ", "Что такое свобода?", "Способность человека действовать в соответствии со своими интересами, опираясь на познание объективной необходимости."],
+        ["Тема 4. СВОБОДА И ОТВЕТСТВЕННОСТЬ", "Может ли свобода в обществе быть абсолютной?", "Нет, так как абсолютная свобода одного человека неминуемо нарушает свободу других людей."],
+        ["Тема 4. СВОБОДА И ОТВЕТСТВЕННОСТЬ", "Что такое необходимость?", "Объективные законы природы и общества, которые не зависят от воли человека, но определяют рамки его свободы."],
+        ["Тема 4. СВОБОДА И ОТВЕТСТВЕННОСТЬ", "Как соотносятся свобода и ответственность?", "Свобода – это всегда выбор, а за последствия своего выбора человек несет полную ответственность."],
+        ["Тема 4. СВОБОДА И ОТВЕТСТВЕННОСТЬ", "Что такое фатализм?", "Мировоззрение, утверждающее, что все события в мире предопределены судьбой и человек не властен над ними."],
+        ["Тема 4. СВОБОДА И ОТВЕТСТВЕННОСТЬ", "Что такое волюнтаризм?", "Мировоззрение, абсолютизирующее свободу воли человека и игнорирующее объективные законы и необходимость."],
+        ["Тема 4. СВОБОДА И ОТВЕТСТВЕННОСТЬ", "Что такое социальная ответственность?", "Осознание человеком последствий своих поступков для общества и готовность отвечать за них."],
+        ["Тема 4. СВОБОДА И ОТВЕТСТВЕННОСТЬ", "Какие виды ответственности существуют?", "Юридическая, моральная, политическая, дисциплинарная и другие."],
+        ["Тема 4. СВОБОДА И ОТВЕТСТВЕННОСТЬ", "Что является главным внутренним регулятором моральной ответственности?", "Совесть человека."],
+        ["Тема 5. ОТКЛОНЯЮЩЕЕСЯ ПОВЕДЕНИЕ", "Что такое отклоняющееся (девиантное) поведение?", "Это поведение индивида или группы, которое не соответствует общепринятым социальным нормам."],
+        ["Тема 5. ОТКЛОНЯЮЩЕЕСЯ ПОВЕДЕНИЕ", "Всегда ли отклоняющееся поведение носит негативный характер?", "Нет, оно может быть позитивным: героизм, гениальность, сверхтрудолюбие."],
+        ["Тема 5. ОТКЛОНЯЮЩЕЕСЯ ПОВЕДЕНИЕ", "Приведите примеры негативного девиантного поведения.", "К ним относятся: алкоголизм, наркомания, хулиганство, игромания."],
+        ["Тема 5. ОТКЛОНЯЮЩЕЕСЯ ПОВЕДЕНИЕ", "Что такое делинквентное поведение?", "Крайняя форма девиантного поведения, представляющая собой нарушение норм права (преступность)."],
+        ["Тема 5. ОТКЛОНЯЮЩЕЕСЯ ПОВЕДЕНИЕ", "Назовите основные причины девиантного поведения.", "Социальное неравенство, влияние маргинальных групп, кризисы в обществе и семье."],
+        ["Тема 5. ОТКЛОНЯЮЩЕЕСЯ ПОВЕДЕНИЕ", "Что такое социальный контроль?", "Механизм регуляции отношений индивида и общества с целью укрепления порядка и стабильности."],
+        ["Тема 5. ОТКЛОНЯЮЩЕЕСЯ ПОВЕДЕНИЕ", "Из каких двух основных элементов состоит социальный контроль?", "Из социальных норм и социальных санкций."],
+        ["Тема 5. ОТКЛОНЯЮЩЕЕСЯ ПОВЕДЕНИЕ", "Что такое социальная норма?", "Установленное в обществе правило или стандарт поведения, регулирующий отношения между людьми."],
+        ["Тема 5. ОТКЛОНЯЮЩЕЕСЯ ПОВЕДЕНИЕ", "На какие два основных вида делятся социальные санкции?", "На формальные (от официальных организаций) и неформальные (от социального окружения)."],
+        ["Тема 5. ОТКЛОНЯЮЩЕЕСЯ ПОВЕДЕНИЕ", "Приведите примеры позитивных и негативных санкций.", "Позитивные: премия, похвала. Негативные: штраф, бойкот."],
+        ["Тема 6. СОЦИАЛЬНАЯ РОЛЬ И СТАТУС", "Что такое социальный статус?", "Положение человека в обществе, определяющее его права, обязанности и привилегии."],
+        ["Тема 6. СОЦИАЛЬНАЯ РОЛЬ И СТАТУС", "Что такое предписанный социальный статус?", "Статус, данный человеку от рождения или независимо от его воли (пол, возраст, национальность)."],
+        ["Тема 6. СОЦИАЛЬНАЯ РОЛЬ И СТАТУС", "Что такое достигнутый социальный статус?", "Статус, приобретенный человеком благодаря его собственным усилиям (образование, профессия)."],
+        ["Тема 6. СОЦИАЛЬНАЯ РОЛЬ И СТАТУС", "Что такое статусный набор?", "Совокупность всех социальных статусов, которыми одновременно обладает один конкретный человек."],
+        ["Тема 6. СОЦИАЛЬНАЯ РОЛЬ И СТАТУС", "Что такое социальная роль?", "Ожидаемая модель поведения, которую общество требует от человека с определенным социальным статусом."],
+        ["Тема 6. СОЦИАЛЬНАЯ РОЛЬ И СТАТУС", "Чем социальный статус отличается от социальной роли?", "Статус – это положение (кем человек является), а роль – это поведение (что человек делает)."],
+        ["Тема 6. СОЦИАЛЬНАЯ РОЛЬ И СТАТУС", "Что такое ролевой конфликт?", "Ситуация, когда требования различных социальных ролей одного человека противоречат друг другу."],
+        ["Тема 6. СОЦИАЛЬНАЯ РОЛЬ И СТАТУС", "Что такое престиж в социологии?", "Оценка обществом значимости тех или иных позиций, занимаемых индивидом (например, престиж профессии)."],
+        ["Тема 6. СОЦИАЛЬНАЯ РОЛЬ И СТАТУС", "Что такое авторитет?", "Степень признания обществом личных и деловых качеств конкретного человека."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "Что такое социальная стратификация?", "Это разделение общества на расположенные в иерархическом порядке слои (страты)."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "Назовите основные критерии социальной стратификации в современном обществе.", "К ним относят: уровень дохода, объем власти, уровень образования и престиж профессии."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "Перечислите исторические типы социальной стратификации.", "Рабство, касты, сословия и классы."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "В чем суть классовой системы стратификации?", "Принадлежность к страте определяется отношением к собственности и доходом (открытая система)."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "Что такое социальная мобильность?", "Любые изменения в социальном положении индивида или группы, переход из одной страты в другую."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "Что такое вертикальная социальная мобильность?", "Перемещение индивида вверх (восходящая) или вниз (нисходящая) по социальной иерархии."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "Что такое горизонтальная социальная мобильность?", "Переход человека в другую группу без изменения уровня его социального статуса."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "В чем отличие межпоколенной мобильности от внутрипоколенной?", "Межпоколенная: дети меняют статус по сравнению с родителями. Внутрипоколенная: человек меняет статус в течение жизни."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "Что такое «социальные лифты» (каналы социальной мобильности)?", "Это пути, по которым происходит перемещение людей из одних социальных групп в другие."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "Назовите основные социальные лифты современного общества.", "К ним относятся: образование, армия, бизнес, церковь, политика, брак."],
+        ["Тема 7. СОЦИАЛЬНАЯ МОБИЛЬНОСТЬ И СТРАТИФИКАЦИЯ", "Кто такие маргиналы?", "Это люди, утратившие свой прежний социальный статус, но не адаптировавшиеся в новой социальной среде."],
+        ["Тема 8. СЕМЬЯ И БРАК", "Что такое семья как малая социальная группа?", "Объединение людей, связанных кровным родством или браком, общностью быта и взаимной ответственностью."],
+        ["Тема 8. СЕМЬЯ И БРАК", "Что такое семья как социальный институт?", "Комплекс социальных норм, образцов поведения, прав и обязанностей, регулирующих отношения супругов, родителей и детей."],
+        ["Тема 8. СЕМЬЯ И БРАК", "В чем заключается репродуктивная функция семьи?", "В биологическом воспроизводстве населения и продолжении человеческого рода."],
+        ["Тема 8. СЕМЬЯ И БРАК", "В чем суть воспитательной функции семьи?", "В первичной социализации детей, передаче им моральных норм, ценностей и жизненного опыта."],
+        ["Тема 8. СЕМЬЯ И БРАК", "В чем проявляется экономическая (хозяйственно-бытовая) функция семьи?", "В ведении совместного хозяйства и финансовой поддержке всех членов семьи."],
+        ["Тема 8. СЕМЬЯ И БРАК", "Чем нуклеарная семья отличается от расширенной (многопоколенной)?", "Нуклеарная состоит только из супругов и детей, расширенная включает и других родственников (например, бабушек)."],
+        ["Тема 8. СЕМЬЯ И БРАК", "Какова особенность патриархальной (традиционной) семьи?", "Главенство мужчины, жесткое разделение обязанностей на мужские и женские, экономическая зависимость женщины."],
+        ["Тема 8. СЕМЬЯ И БРАК", "Что характерно для партнерской (эгалитарной) семьи?", "Равноправие супругов, совместное принятие решений и справедливое распределение бытовых обязанностей."],
+        ["Тема 8. СЕМЬЯ И БРАК", "Что такое брак?", "Исторически обусловленная, санкционированная и регулируемая обществом форма отношений между мужчиной и женщиной."],
+        ["Тема 8. СЕМЬЯ И БРАК", "Назовите основные условия заключения брака в РФ.", "Взаимное добровольное согласие сторон и достижение ими брачного возраста."],
+        ["Тема 8. СЕМЬЯ И БРАК", "Перечислите основные обстоятельства, препятствующие заключению брака.", "Наличие другого нерасторгнутого брака, близкое кровное родство, недееспособность вследствие психического расстройства."],
+        ["Тема 8. СЕМЬЯ И БРАК", "Что такое фактический (сожительство) брак?", "Длительное совместное проживание мужчины и женщины без официальной регистрации отношений в ЗАГС."]
+      ],
+      "s3_1": [
+        ["Тема 1. ОСНОВЫ ЭКОНОМИКИ", "Что такое экономика как наука?", "Это наука, изучающая способы удовлетворения постоянно растущих потребностей общества в условиях ограниченности ресурсов."],
+        ["Тема 1. ОСНОВЫ ЭКОНОМИКИ", "Что такое экономика как хозяйство?", "Это система хозяйствования, обеспечивающая общество материальными и духовными благами."],
+        ["Тема 1. ОСНОВЫ ЭКОНОМИКИ", "Назовите главную проблему экономики.", "Удовлетворение безграничных потребностей людей с помощью ограниченных ресурсов."],
+        ["Тема 1. ОСНОВЫ ЭКОНОМИКИ", "Что такое факторы производства?", "Ресурсы, используемые людьми для создания экономических благ."],
+        ["Тема 1. ОСНОВЫ ЭКОНОМИКИ", "Перечислите основные факторы производства.", "К ним относятся: труд, земля, капитал, предпринимательские способности и информация."],
+        ["Тема 1. ОСНОВЫ ЭКОНОМИКИ", "Что является факторным доходом от труда?", "Заработная плата."],
+        ["Тема 1. ОСНОВЫ ЭКОНОМИКИ", "Что является факторным доходом от капитала?", "Процент."],
+        ["Тема 1. ОСНОВЫ ЭКОНОМИКИ", "Что является факторным доходом от предпринимательских способностей?", "Прибыль."],
+        ["Тема 1. ОСНОВЫ ЭКОНОМИКИ", "Что такое макроэкономика?", "Раздел науки, изучающий экономику страны или мира в целом."],
+        ["Тема 1. ОСНОВЫ ЭКОНОМИКИ", "Что такое микроэкономика?", "Раздел науки, изучающий поведение отдельных потребителей, фирм и отраслей."],
+        ["Тема 2. ЭКОНОМИЧЕСКИЕ СИСТЕМЫ", "Что такое экономическая система?", "Способ организации хозяйственной жизни общества, определяющий, что, как и для кого производить."],
+        ["Тема 2. ЭКОНОМИЧЕСКИЕ СИСТЕМЫ", "Назовите основные типы экономических систем.", "К ним относятся: традиционная, командная (плановая), рыночная и смешанная."],
+        ["Тема 2. ЭКОНОМИЧЕСКИЕ СИСТЕМЫ", "В чем главная особенность традиционной экономики?", "Опора на обычаи, преобладание ручного труда и натурального хозяйства."],
+        ["Тема 2. ЭКОНОМИЧЕСКИЕ СИСТЕМЫ", "Что характерно для командной (плановой) экономики?", "Государственная собственность на средства производства и централизованное директивное планирование."],
+        ["Тема 2. ЭКОНОМИЧЕСКИЕ СИСТЕМЫ", "Каковы признаки рыночной экономики?", "Частная собственность, свобода предпринимательства, конкуренция и свободное ценообразование."],
+        ["Тема 2. ЭКОНОМИЧЕСКИЕ СИСТЕМЫ", "Что такое смешанная экономика?", "Система, сочетающая механизмы рынка с государственным регулированием для сглаживания недостатков рынка."],
+        ["Тема 3. РЫНОК И КОНКУРЕНЦИЯ", "Что такое рынок?", "Совокупность экономических отношений, связанных с обменом товаров и услуг в результате купли-продажи."],
+        ["Тема 3. РЫНОК И КОНКУРЕНЦИЯ", "Что такое конкуренция?", "Соперничество между участниками рынка за лучшие условия производства и купли-продажи."],
+        ["Тема 3. РЫНОК И КОНКУРЕНЦИЯ", "Назовите виды рыночной конкуренции.", "Совершенная (чистая) и несовершенная конкуренция."],
+        ["Тема 3. РЫНОК И КОНКУРЕНЦИЯ", "Что такое монополия?", "Тип несовершенной конкуренции, при котором на рынке действует только один продавец уникального товара."],
+        ["Тема 3. РЫНОК И КОНКУРЕНЦИЯ", "Что такое олигополия?", "Рынок, на котором господствуют несколько крупных фирм, преграждающих вход новым конкурентам."],
+        ["Тема 3. РЫНОК И КОНКУРЕНЦИЯ", "Что такое монополистическая конкуренция?", "Рынок, где множество фирм продают схожие, но не идентичные (дифференцированные) товары."],
+        ["Тема 3. РЫНОК И КОНКУРЕНЦИЯ", "Что такое монопсония?", "Ситуация на рынке, когда существует множество продавцов, но только один покупатель."],
+        ["Тема 4. СПРОС И ПРЕДЛОЖЕНИЕ", "Что такое спрос?", "Желание и возможность потребителя купить определенный товар по определенной цене в данное время."],
+        ["Тема 4. СПРОС И ПРЕДЛОЖЕНИЕ", "Как звучит закон спроса?", "При прочих равных условиях, чем выше цена, тем ниже величина спроса, и наоборот."],
+        ["Тема 4. СПРОС И ПРЕДЛОЖЕНИЕ", "Что такое предложение?", "Готовность производителя произвести и продать товар по определенной цене в данное время."],
+        ["Тема 4. СПРОС И ПРЕДЛОЖЕНИЕ", "Как звучит закон предложения?", "При прочих равных условиях, чем выше цена, тем выше величина предложения."],
+        ["Тема 4. СПРОС И ПРЕДЛОЖЕНИЕ", "Что такое равновесная цена?", "Цена, при которой величина спроса равна величине предложения."],
+        ["Тема 4. СПРОС И ПРЕДЛОЖЕНИЕ", "Приведите примеры неценовых факторов спроса.", "К ним относятся: вкусы потребителей, уровень доходов, цены на товары-заменители, мода, сезонность."],
+        ["Тема 5. ИЗДЕРЖКИ ПРОИЗВОДСТВА", "Что такое издержки производства?", "Затраты производителя на приобретение и использование факторов производства."],
+        ["Тема 5. ИЗДЕРЖКИ ПРОИЗВОДСТВА", "На какие два вида делятся издержки в краткосрочном периоде?", "На постоянные и переменные."],
+        ["Тема 5. ИЗДЕРЖКИ ПРОИЗВОДСТВА", "Что такое постоянные издержки?", "Затраты, которые не зависят от объема выпускаемой продукции."],
+        ["Тема 5. ИЗДЕРЖКИ ПРОИЗВОДСТВА", "Что такое переменные издержки?", "Затраты, величина которых напрямую зависит от объема выпускаемой продукции."],
+        ["Тема 5. ИЗДЕРЖКИ ПРОИЗВОДСТВА", "Приведите примеры постоянных издержек.", "К ним относятся: арендная плата, страховые взносы, проценты по кредиту, оклады администрации."],
+        ["Тема 5. ИЗДЕРЖКИ ПРОИЗВОДСТВА", "Приведите примеры переменных издержек.", "К ним относятся: расходы на сырье и материалы, оплата электроэнергии, сдельная зарплата рабочих."],
+        ["Тема 6. ФИНАНСОВЫЕ ИНСТИТУТЫ", "Что такое финансовый институт?", "Организация, выполняющая функции посредника между теми, у кого есть свободные деньги, и теми, кто в них нуждается."],
+        ["Тема 6. ФИНАНСОВЫЕ ИНСТИТУТЫ", "Приведите примеры финансовых институтов.", "К ним относятся: банки, страховые компании, пенсионные фонды, инвестиционные компании."],
+        ["Тема 6. ФИНАНСОВЫЕ ИНСТИТУТЫ", "Для чего нужны страховые компании?", "Для защиты имущественных интересов граждан и организаций при наступлении страховых случаев за счет уплаченных взносов."],
+        ["Тема 6. ФИНАНСОВЫЕ ИНСТИТУТЫ", "В чем заключается роль пенсионных фондов?", "В сборе средств для выплаты пенсий и инвестировании этих средств для получения дохода."],
+        ["Тема 7. БАНКИ", "Что такое банковская система?", "Совокупность действующих в стране банков и других кредитных учреждений."],
+        ["Тема 7. БАНКИ", "Из каких уровней состоит банковская система РФ?", "Она включает два уровня: Центральный банк и коммерческие банки."],
+        ["Тема 7. БАНКИ", "Какова главная функция Центрального банка?", "Эмиссия денег, защита и обеспечение устойчивости национальной валюты (рубля)."],
+        ["Тема 7. БАНКИ", "Имеет ли право Центральный банк обслуживать физических лиц?", "Нет, он работает только с государством и коммерческими банками."],
+        ["Тема 7. БАНКИ", "Какие функции выполняют коммерческие банки?", "Привлечение вкладов, выдача кредитов, расчетно-кассовое обслуживание граждан и фирм."],
+        ["Тема 7. БАНКИ", "Что такое кредит?", "Ссуда в денежной или товарной форме, предоставляемая заемщику на условиях возвратности и платности."],
+        ["Тема 8. ПРЕДПРИНИМАТЕЛЬСТВО", "Что такое предпринимательство?", "Самостоятельная, инициативная деятельность людей, направленная на систематическое получение прибыли."],
+        ["Тема 8. ПРЕДПРИНИМАТЕЛЬСТВО", "Назовите основные признаки предпринимательства.", "К ним относятся: самостоятельность, риск, опора на инновации, цель – получение прибыли."],
+        ["Тема 8. ПРЕДПРИНИМАТЕЛЬСТВО", "Что такое источники финансирования бизнеса?", "Каналы получения средств для создания и развития предприятия."],
+        ["Тема 8. ПРЕДПРИНИМАТЕЛЬСТВО", "На какие группы делятся источники финансирования бизнеса?", "На внутренние (собственные) и внешние (заемные)."],
+        ["Тема 8. ПРЕДПРИНИМАТЕЛЬСТВО", "Приведите примеры внутренних источников финансирования.", "К ним относятся: чистая прибыль фирмы, амортизационные отчисления."],
+        ["Тема 8. ПРЕДПРИНИМАТЕЛЬСТВО", "Приведите примеры внешних источников финансирования.", "К ним относятся: банковский кредит, выпуск акций и облигаций, государственные субсидии."],
+        ["Тема 9. РЫНОК ТРУДА И БЕЗРАБОТИЦА", "Что такое рынок труда?", "Сфера экономических отношений, где формируется спрос и предложение на рабочую силу."],
+        ["Тема 9. РЫНОК ТРУДА И БЕЗРАБОТИЦА", "Что такое заработная плата?", "Форма материального вознаграждения, которую наемный работник получает за свой труд."],
+        ["Тема 9. РЫНОК ТРУДА И БЕЗРАБОТИЦА", "Чем номинальная заработная плата отличается от реальной?", "Номинальная – это сумма денег, а реальная – объем благ, которые можно на нее купить."],
+        ["Тема 9. РЫНОК ТРУДА И БЕЗРАБОТИЦА", "Что такое безработица?", "Социально-экономическое явление, при котором часть трудоспособного населения желает, но не может найти работу."],
+        ["Тема 9. РЫНОК ТРУДА И БЕЗРАБОТИЦА", "Назовите основные виды безработицы.", "К ним относятся: фрикционная, структурная, циклическая и сезонная."],
+        ["Тема 9. РЫНОК ТРУДА И БЕЗРАБОТИЦА", "Что такое фрикционная безработица?", "Безработица, связанная с добровольной сменой работы или первичным поиском работы."],
+        ["Тема 9. РЫНОК ТРУДА И БЕЗРАБОТИЦА", "В чем причина структурной безработицы?", "Устаревание профессий из-за технического прогресса и изменения структуры спроса."],
+        ["Тема 9. РЫНОК ТРУДА И БЕЗРАБОТИЦА", "С чем связана циклическая безработица?", "С экономическим кризисом и общим спадом производства в стране."],
+        ["Тема 9. РЫНОК ТРУДА И БЕЗРАБОТИЦА", "Что такое сезонная безработица?", "Безработица, возникающая из-за сезонных колебаний спроса на труд в определенных отраслях (например, в сельском хозяйстве)."]
+      ],
+      "s3_2": [
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Что такое инфляция?", "Процесс обесценивания денег, который проявляется в виде долговременного повышения цен на товары и услуги."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "В чем заключается причина инфляции спроса?", "В ситуации, когда доходы населения и спрос растут быстрее, чем объем производства товаров."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Что вызывает инфляцию издержек (предложения)?", "Удорожание факторов производства (сырья, электроэнергии, зарплат), ведущее к росту цен на готовую продукцию."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Как называется инфляция, при которой цены растут до 10% в год?", "Ползучая (умеренная) инфляция."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Что характерно для гиперинфляции?", "Рост цен более чем на 50% в месяц, ведущий к полному расстройству финансовой системы."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Назовите негативные последствия инфляции.", "К ним относятся: снижение реальных доходов населения, обесценивание сбережений и падение уровня жизни."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Что такое экономический рост?", "Долговременное увеличение реального объема валового внутреннего продукта (ВВП) как в абсолютных значениях, так и в расчете на каждого жителя страны."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Что такое экстенсивный экономический рост?", "Увеличение ВВП за счет расширения масштабов использования ресурсов (вовлечение новых земель, найм дополнительных рабочих)."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "В чем суть интенсивного экономического роста?", "Увеличение ВВП за счет качественного улучшения факторов производства (внедрение новых технологий, повышение квалификации работников)."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Что такое валовой внутренний продукт (ВВП)?", "Рыночная стоимость всех конечных товаров и услуг, произведенных за год на территории государства."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Чем реальный ВВП отличается от номинального?", "Номинальный рассчитывается в текущих ценах, а реальный – с учетом уровня инфляции (в ценах базового года)."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Что такое валовой национальный продукт (ВНП)?", "Рыночная стоимость конечных благ, созданных гражданами государства как внутри страны, так и за рубежом."],
+        ["Тема 10. ЭКОНОМИЧЕСКИЙ РОСТ И РАЗВИТИЕ", "Что отражает понятие «экономический цикл»?", "Периодические колебания деловой активности, включающие фазы подъема, пика, спада (рецессии) и дна."],
+        ["Тема 11. РОЛЬ ГОСУДАРСТВА В ЭКОНОМИКЕ", "Каковы основные экономические функции государства?", "К ним относятся: защита конкуренции, производство общественных благ, перераспределение доходов и борьба с кризисами."],
+        ["Тема 11. РОЛЬ ГОСУДАРСТВА В ЭКОНОМИКЕ", "Что такое общественные блага?", "Товары и услуги, которые государство предоставляет всем гражданам на равных началах (оборона, бесплатное образование, освещение улиц)."],
+        ["Тема 11. РОЛЬ ГОСУДАРСТВА В ЭКОНОМИКЕ", "Что относится к прямым (административным) методам регулирования экономики?", "К ним относятся: издание законов, лицензирование, установление квот и штрафов."],
+        ["Тема 11. РОЛЬ ГОСУДАРСТВА В ЭКОНОМИКЕ", "Что относится к косвенным (экономическим) методам регулирования экономики?", "К ним относятся: изменение налоговых ставок, ключевой ставки Центробанка и регулирование госбюджета."],
+        ["Тема 11. РОЛЬ ГОСУДАРСТВА В ЭКОНОМИКЕ", "Что такое монетарная (кредитно-денежная) политика?", "Меры Центрального банка по регулированию объема денежной массы и изменению ключевой ставки для контроля инфляции."],
+        ["Тема 11. РОЛЬ ГОСУДАРСТВА В ЭКОНОМИКЕ", "Что такое фискальная (бюджетно-налоговая) политика?", "Меры правительства по изменению государственных расходов и системы налогообложения."],
+        ["Тема 12. НАЛОГИ", "Что такое налоги?", "Обязательные, безвозмездные платежи физических и юридических лиц государству."],
+        ["Тема 12. НАЛОГИ", "Какова главная (фискальная) функция налогов?", "Формирование доходной части государственного бюджета."],
+        ["Тема 12. НАЛОГИ", "Чем прямые налоги отличаются от косвенных?", "Прямые взимаются непосредственно с доходов или имущества, а косвенные изначально включены в цену товаров и услуг."],
+        ["Тема 12. НАЛОГИ", "Приведите примеры прямых налогов.", "К ним относятся: налог на доходы физических лиц (НДФЛ), налог на прибыль организаций, транспортный налог."],
+        ["Тема 12. НАЛОГИ", "Приведите примеры косвенных налогов.", "К ним относятся: налог на добавленную стоимость (НДС), акцизы, таможенные пошлины."],
+        ["Тема 12. НАЛОГИ", "В чем суть прогрессивной шкалы налогообложения?", "Ставка налога возрастает по мере увеличения уровня дохода налогоплательщика."],
+        ["Тема 12. НАЛОГИ", "Что характерно для пропорциональной шкалы налогообложения?", "Ставка налога остается неизменной независимо от размера дохода."],
+        ["Тема 12. НАЛОГИ", "Назовите три уровня налогов в Российской Федерации.", "К ним относятся: федеральные, региональные и местные налоги."],
+        ["Тема 12. НАЛОГИ", "Какие налоги относятся к местным в РФ?", "К ним относятся: земельный налог, налог на имущество физических лиц и торговый сбор."],
+        ["Тема 13. ГОСУДАРСТВЕННЫЙ БЮДЖЕТ", "Что такое государственный бюджет?", "Сводный финансовый план государства, отражающий его доходы и расходы на определенный период (обычно на год)."],
+        ["Тема 13. ГОСУДАРСТВЕННЫЙ БЮДЖЕТ", "Из чего состоит доходная часть государственного бюджета?", "Она формируется из налогов, таможенных пошлин, прибыли государственных предприятий и эмиссии денег."],
+        ["Тема 13. ГОСУДАРСТВЕННЫЙ БЮДЖЕТ", "На что идут средства из расходной части государственного бюджета?", "К основным статьям относятся: социальные выплаты, оборона, содержание госаппарата и развитие инфраструктуры."],
+        ["Тема 13. ГОСУДАРСТВЕННЫЙ БЮДЖЕТ", "Что такое дефицит государственного бюджета?", "Ситуация, при которой запланированные расходы государства превышают его доходы."],
+        ["Тема 13. ГОСУДАРСТВЕННЫЙ БЮДЖЕТ", "Что такое профицит государственного бюджета?", "Ситуация, при которой доходы государства превышают его запланированные расходы."],
+        ["Тема 14. ГОСУДАРСТВЕННЫЙ ДОЛГ", "Что такое государственный долг?", "Сумма задолженности государства перед отечественными и иностранными кредиторами."],
+        ["Тема 14. ГОСУДАРСТВЕННЫЙ ДОЛГ", "Чем внутренний государственный долг отличается от внешнего?", "Внутренний – это долг перед гражданами и фирмами своей страны, а внешний – перед другими государствами и международными организациями."],
+        ["Тема 15. МИРОВАЯ ЭКОНОМИКА", "Что такое мировая экономика?", "Совокупность национальных экономик, связанных между собой системой международных экономических отношений."],
+        ["Тема 15. МИРОВАЯ ЭКОНОМИКА", "Что такое международное разделение труда?", "Специализация отдельных стран на производстве определенных видов товаров и услуг для последующего обмена."],
+        ["Тема 15. МИРОВАЯ ЭКОНОМИКА", "Чем экспорт отличается от импорта?", "Экспорт – это вывоз товаров из страны для продажи, а импорт – ввоз товаров из-за границы."],
+        ["Тема 15. МИРОВАЯ ЭКОНОМИКА", "Что такое сальдо торгового баланса?", "Разница между стоимостью экспорта и импорта страны за определенный период."],
+        ["Тема 15. МИРОВАЯ ЭКОНОМИКА", "Что такое протекционизм?", "Государственная политика защиты отечественных производителей от иностранной конкуренции с помощью пошлин и квот."],
+        ["Тема 15. МИРОВАЯ ЭКОНОМИКА", "Что такое фритредерство (свободная торговля)?", "Политика минимального вмешательства государства во внешнюю торговлю, отсутствие искусственных барьеров для импорта."],
+        ["Тема 15. МИРОВАЯ ЭКОНОМИКА", "Назовите основные методы протекционизма.", "К ним относятся: введение высоких таможенных пошлин, квотирование импорта, эмбарго и субсидирование местных производителей."]
+      ],
+      "s4_1": [
+        ["Тема 1. ПОЛИТИКА И ВЛАСТЬ", "Что такое политика?", "Это деятельность, направленная на управление обществом и распределение ресурсов и власти."],
+        ["Тема 1. ПОЛИТИКА И ВЛАСТЬ", "Что такое власть?", "Это способность и возможность одного человека или группы лиц оказывать влияние на других, управлять их поведением."],
+        ["Тема 1. ПОЛИТИКА И ВЛАСТЬ", "Назовите основные источники власти.", "К ним относятся: сила, авторитет, закон, богатство и харизма."],
+        ["Тема 1. ПОЛИТИКА И ВЛАСТЬ", "Что такое политическая власть?", "Право, способность и возможность отстаивать и претворять в жизнь определенные политические взгляды, установки и цели."],
+        ["Тема 1. ПОЛИТИКА И ВЛАСТЬ", "Что означает термин «легитимность власти»?", "Это признание обществом законности и справедливости действующей власти, готовность ей подчиняться."],
+        ["Тема 1. ПОЛИТИКА И ВЛАСТЬ", "Что такое легальность власти?", "Это формальная законность власти, ее соответствие действующей конституции и законам."],
+        ["Тема 1. ПОЛИТИКА И ВЛАСТЬ", "Назовите типы легитимности по Максу Веберу.", "К ним относятся: традиционный, харизматический и рационально-легальный типы."],
+        ["Тема 1. ПОЛИТИКА И ВЛАСТЬ", "В чем суть харизматического типа легитимности?", "Власть опирается на исключительные личные качества лидера и слепую веру в него масс."],
+        ["Тема 1. ПОЛИТИКА И ВЛАСТЬ", "Каковы основные функции политической власти?", "К ним относятся: управленческая, интегрирующая, контролирующая и мобилизационная."],
+        ["Тема 1. ПОЛИТИКА И ВЛАСТЬ", "Что такое государственная власть?", "Это вид политической власти, где субъектом выступает государство в лице своих органов и должностных лиц."],
+        ["Тема 2. ГОСУДАРСТВО: ПРИЗНАКИ И ФУНКЦИИ", "Что такое государство?", "Политико-территориальная суверенная организация публичной власти, обладающая аппаратом управления и принуждения."],
+        ["Тема 2. ГОСУДАРСТВО: ПРИЗНАКИ И ФУНКЦИИ", "Назовите главные признаки государства.", "К ним относятся: территория, публичная власть, суверенитет, налоги и правотворчество."],
+        ["Тема 2. ГОСУДАРСТВО: ПРИЗНАКИ И ФУНКЦИИ", "Что такое государственный суверенитет?", "Это независимость государства во внешней политике и верховенство его власти внутри страны."],
+        ["Тема 2. ГОСУДАРСТВО: ПРИЗНАКИ И ФУНКЦИИ", "В чем заключается монополия государства на легальное насилие?", "Только государство имеет законное право применять принуждение к гражданам для поддержания порядка."],
+        ["Тема 2. ГОСУДАРСТВО: ПРИЗНАКИ И ФУНКЦИИ", "Для чего государству необходимо право на взимание налогов?", "Для формирования бюджета, содержания аппарата управления и выполнения своих функций."],
+        ["Тема 2. ГОСУДАРСТВО: ПРИЗНАКИ И ФУНКЦИИ", "На какие две группы делятся функции государства?", "На внутренние и внешние."],
+        ["Тема 2. ГОСУДАРСТВО: ПРИЗНАКИ И ФУНКЦИИ", "Приведите примеры внутренних функций государства.", "К ним относятся: экономическая, социальная, правоохранительная, культурно-образовательная."],
+        ["Тема 2. ГОСУДАРСТВО: ПРИЗНАКИ И ФУНКЦИИ", "Приведите примеры внешних функций государства.", "К ним относятся: оборона страны, внешнеэкономическое сотрудничество, участие в решении глобальных проблем."],
+        ["Тема 2. ГОСУДАРСТВО: ПРИЗНАКИ И ФУНКЦИИ", "В чем суть социальной функции государства?", "В обеспечении достойного уровня жизни граждан, поддержке незащищенных слоев населения."],
+        ["Тема 2. ГОСУДАРСТВО: ПРИЗНАКИ И ФУНКЦИИ", "Какова цель правоохранительной функции государства?", "Защита прав и свобод граждан, обеспечение законности и правопорядка."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Что такое форма государства?", "Это устройство политической организации общества, призванное обеспечить его стабильность и нормальное функционирование."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Из каких трех элементов состоит форма государства?", "Форма правления, форма государственно-территориального устройства и политический режим."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Что такое форма правления?", "Это способ организации верховной государственной власти и порядок ее формирования."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "На какие два основных вида делится форма правления?", "На монархию и республику."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Что такое монархия?", "Форма правления, при которой верховная власть полностью или частично принадлежит одному лицу и передается по наследству."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Чем абсолютная монархия отличается от ограниченной (конституционной)?", "В абсолютной власть монарха ничем не ограничена, а в конституционной – ограничена парламентом и конституцией."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Что такое республика?", "Форма правления, при которой высшие органы власти избираются народом на строго определенный срок."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Назовите основные виды республик.", "К ним относятся: президентская, парламентская и смешанная (полупрезидентская)."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "В чем главная особенность президентской республики?", "Президент избирается всенародно, является главой государства и сам формирует правительство."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Какова роль парламента в парламентской республике?", "Парламент формирует правительство, которое несет перед ним ответственность, и выбирает номинального президента."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Что такое форма государственно-территориального устройства?", "Это способ территориальной организации государства и распределения полномочий между центром и регионами."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Назовите три формы государственного устройства.", "Унитарное государство, федерация и конфедерация."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "В чем суть унитарного государства?", "Единое государство, части которого не обладают политической самостоятельностью (нет своих конституций и парламентов)."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Что такое федерация?", "Сложное союзное государство, части которого (субъекты) обладают определенной политической самостоятельностью и своими законами."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Что такое конфедерация?", "Союз независимых государств, созданный для достижения конкретных политических или экономических целей."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Что такое политический режим?", "Совокупность методов и способов осуществления государственной власти."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "На какие два типа делятся политические режимы?", "На демократические и недемократические (авторитарные, тоталитарные)."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Что такое тоталитаризм?", "Режим, при котором государство осуществляет всеобъемлющий (тотальный) контроль над всеми сферами жизни общества и частной жизнью граждан."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Назовите основные черты тоталитаризма.", "К ним относятся: единственная массовая партия, официальная идеология, массовый террор, монополия на СМИ."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Что такое авторитаризм?", "Режим, при котором власть жестко контролирует политическую сферу, но допускает определенную свободу в экономике и частной жизни."],
+        ["Тема 3. ФОРМА ГОСУДАРСТВА (3 ЧАСТИ)", "Чем авторитаризм отличается от тоталитаризма?", "При авторитаризме нет тотального контроля над обществом, массового террора и обязательной идеологии, допускается рыночная экономика."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Что такое орган государственной власти?", "Часть государственного аппарата, наделенная властными полномочиями для осуществления функций государства."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Каков статус Президента РФ согласно Конституции?", "Президент является главой государства, гарантом Конституции и верховным главнокомандующим (не относится ни к одной из ветвей власти)."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Назовите высший орган законодательной власти в РФ.", "Федеральное Собрание (парламент)."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Из каких двух палат состоит Федеральное Собрание РФ?", "Из Совета Федерации (верхняя палата) и Государственной Думы (нижняя палата)."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Кто осуществляет исполнительную власть в РФ?", "Правительство Российской Федерации."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "К ведению какого органа относится объявление амнистии?", "Государственной Думы."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Кто решает вопрос о возможности использования Вооруженных Сил РФ за пределами территории страны?", "Совет Федерации."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "К полномочиям какого органа относится разработка и исполнение федерального бюджета?", "Правительства РФ."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Какой орган власти решает вопросы гражданства РФ и предоставления политического убежища?", "Президент РФ."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Кто утверждает изменение границ между субъектами РФ?", "Совет Федерации."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Кто назначает Председателя Центрального банка РФ?", "Государственная Дума."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Кто осуществляет управление федеральной собственностью?", "Правительство РФ."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "К полномочиям какого органа относится помилование?", "Президента РФ."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Кто осуществляет судебную власть в РФ?", "Суды (Конституционный Суд, Верховный Суд и суды общей юрисдикции)."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Что делает Конституционный Суд РФ?", "Проверяет законы и нормативные акты на соответствие Конституции РФ."],
+        ["Тема 4. ОРГАНЫ ГОСУДАРСТВЕННОЙ ВЛАСТИ РФ", "Назовите высший судебный орган по гражданским, уголовным, административным и иным делам.", "Верховный Суд РФ."],
+        ["Тема 5. ПРИНЦИП РАЗДЕЛЕНИЯ ВЛАСТЕЙ И ДЕМОКРАТИЯ", "В чем суть принципа разделения властей?", "Распределение государственной власти на три независимые ветви (законодательную, исполнительную, судебную) для предотвращения узурпации."],
+        ["Тема 5. ПРИНЦИП РАЗДЕЛЕНИЯ ВЛАСТЕЙ И ДЕМОКРАТИЯ", "Что такое «система сдержек и противовесов»?", "Механизм, при котором ветви власти взаимно контролируют и ограничивают друг друга, не допуская преобладания одной из них."],
+        ["Тема 5. ПРИНЦИП РАЗДЕЛЕНИЯ ВЛАСТЕЙ И ДЕМОКРАТИЯ", "Назовите основные ветви власти.", "Законодательная, исполнительная и судебная."],
+        ["Тема 5. ПРИНЦИП РАЗДЕЛЕНИЯ ВЛАСТЕЙ И ДЕМОКРАТИЯ", "Что такое демократия?", "Политический режим, при котором народ признается единственным источником власти и носителем суверенитета."],
+        ["Тема 5. ПРИНЦИП РАЗДЕЛЕНИЯ ВЛАСТЕЙ И ДЕМОКРАТИЯ", "Перечислите основные признаки демократии.", "К ним относятся: выборность органов власти, политический плюрализм, свобода СМИ, гарантия прав и свобод человека."],
+        ["Тема 5. ПРИНЦИП РАЗДЕЛЕНИЯ ВЛАСТЕЙ И ДЕМОКРАТИЯ", "Чем прямая (непосредственная) демократия отличается от представительной?", "При прямой народ сам принимает решения (референдум), при представительной – через избранных депутатов."],
+        ["Тема 5. ПРИНЦИП РАЗДЕЛЕНИЯ ВЛАСТЕЙ И ДЕМОКРАТИЯ", "Что такое референдум?", "Всенародное голосование граждан по наиболее важным вопросам государственного или местного значения."],
+        ["Тема 5. ПРИНЦИП РАЗДЕЛЕНИЯ ВЛАСТЕЙ И ДЕМОКРАТИЯ", "Что такое политический плюрализм?", "Многообразие политических идей, взглядов, партий и движений, конкурирующих между собой."],
+        ["Тема 5. ПРИНЦИП РАЗДЕЛЕНИЯ ВЛАСТЕЙ И ДЕМОКРАТИЯ", "Какова роль меньшинства в демократическом обществе?", "Большинство принимает решения, но право меньшинства на оппозицию и выражение своего мнения гарантируется законом."],
+        ["Тема 6. ПРАВОВОЕ ГОСУДАРСТВО", "Что такое правовое государство?", "Демократическое государство, организация и деятельность которого подчинены праву и в котором гарантируются права и свободы граждан."],
+        ["Тема 6. ПРАВОВОЕ ГОСУДАРСТВО", "Назовите главный принцип правового государства.", "Верховенство закона во всех сферах жизни общества."],
+        ["Тема 6. ПРАВОВОЕ ГОСУДАРСТВО", "Что означает принцип взаимной ответственности государства и личности?", "Не только граждане несут ответственность перед законом, но и государство отвечает перед гражданами за невыполнение своих обязательств."],
+        ["Тема 6. ПРАВОВОЕ ГОСУДАРСТВО", "Является ли разделение властей признаком правового государства?", "Да, это один из важнейших принципов, защищающий общество от произвола власти."],
+        ["Тема 6. ПРАВОВОЕ ГОСУДАРСТВО", "Что означает «незыблемость прав и свобод человека»?", "Права человека даны ему от рождения, они признаются высшей ценностью, и государство обязано их соблюдать и защищать."],
+        ["Тема 7. ПОЛИТИЧЕСКАЯ СИСТЕМА", "Что такое политическая система общества?", "Это совокупность политических институтов, норм, ценностей и взаимодействий, с помощью которых осуществляется политическая власть."],
+        ["Тема 7. ПОЛИТИЧЕСКАЯ СИСТЕМА", "Назовите четыре основные подсистемы политической системы.", "Институциональная (организационная), нормативная, коммуникативная и культурно-идеологическая."],
+        ["Тема 7. ПОЛИТИЧЕСКАЯ СИСТЕМА", "Что включает в себя институциональная подсистема?", "Государство, политические партии, общественно-политические движения, СМИ."],
+        ["Тема 7. ПОЛИТИЧЕСКАЯ СИСТЕМА", "Из чего состоит нормативная подсистема политической системы?", "Из политических, правовых и моральных норм, обычаев и традиций, регулирующих политическую жизнь."],
+        ["Тема 7. ПОЛИТИЧЕСКАЯ СИСТЕМА", "Что охватывает коммуникативная подсистема?", "Все формы взаимодействия и обмена информацией между участниками политического процесса."],
+        ["Тема 7. ПОЛИТИЧЕСКАЯ СИСТЕМА", "Что относится к культурно-идеологической подсистеме?", "Политические идеи, идеологии, ценности, политическая культура и психология."],
+        ["Тема 7. ПОЛИТИЧЕСКАЯ СИСТЕМА", "Какова главная функция политической системы?", "Определение целей развития общества, политическое руководство и интеграция общества."],
+        ["Тема 8. ГРАЖДАНСКОЕ ОБЩЕСТВО", "Что такое гражданское общество?", "Совокупность негосударственных отношений и организаций, выражающих частные интересы и потребности свободных граждан."],
+        ["Тема 8. ГРАЖДАНСКОЕ ОБЩЕСТВО", "В какой сфере возникает гражданское общество?", "Вне рамок властно-государственных структур, в сфере добровольной самоорганизации людей."],
+        ["Тема 8. ГРАЖДАНСКОЕ ОБЩЕСТВО", "Назовите основные признаки гражданского общества.", "К ним относятся: частная собственность, свобода экономической деятельности, независимость от государства, горизонтальные связи."],
+        ["Тема 8. ГРАЖДАНСКОЕ ОБЩЕСТВО", "Что понимается под «горизонтальными связями» в гражданском обществе?", "Равноправные отношения между свободными гражданами и их объединениями (в отличие от вертикальных связей подчинения в государстве)."],
+        ["Тема 8. ГРАЖДАНСКОЕ ОБЩЕСТВО", "Приведите примеры институтов гражданского общества.", "К ним относятся: политические партии, профсоюзы, благотворительные фонды, независимые СМИ, церковь, семья."],
+        ["Тема 8. ГРАЖДАНСКОЕ ОБЩЕСТВО", "Какова главная функция гражданского общества?", "Защита частных интересов граждан, контроль за деятельностью государства и предотвращение его вмешательства в частную жизнь."],
+        ["Тема 8. ГРАЖДАНСКОЕ ОБЩЕСТВО", "Как связаны гражданское общество и правовое государство?", "Они не могут существовать друг без друга: гражданское общество может развиваться только в условиях демократии и правового государства."]
+      ],
+      "s4_2": [
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "Что такое политическая партия?", "Организация единомышленников, выражающая интересы социальных групп и стремящаяся к завоеванию государственной власти."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "Назовите основные признаки политической партии.", "К ним относятся: наличие программы и устава, организационная структура, стремление к власти."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "Каковы основные функции политических партий?", "К ним относятся: политическая социализация, выдвижение кандидатов на выборы, разработка программ развития общества."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "В чем разница между кадровыми и массовыми партиями?", "Кадровые немногочисленны и активны только в период выборов, а массовые имеют жесткую дисциплину и постоянное членство."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "Чем правящие партии отличаются от оппозиционных?", "Правящие находятся у власти, а оппозиционные выступают против политики действующего правительства."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "В чем разница между левыми, центристскими и правыми партиями?", "Левые выступают за социальное равенство, центристы – за компромисс, правые – за сохранение традиций и частной собственности."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "В чем суть консервативной идеологии?", "Опора на традиции, порядок, стабильность и сильное государство."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "Что провозглашает либеральная идеология?", "Священность частной собственности, свободу предпринимательства и приоритет прав личности."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "В чем главная идея социал-демократической идеологии?", "Защита интересов трудящихся, социальное государство и сглаживание имущественного неравенства."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "Что является основой коммунистической идеологии?", "Идея построения бесклассового общества и ликвидация частной собственности на средства производства."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "Что такое партийная система?", "Совокупность политических партий и связей между ними в государстве."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "Назовите виды партийных систем.", "Однопартийная, двухпартийная и многопартийная."],
+        ["Тема 9. ПОЛИТИЧЕСКИЕ ПАРТИИ", "Что такое общественно-политическое движение?", "Добровольное формирование, стремящееся влиять на власть для решения конкретных проблем, но не ставящее целью ее завоевание."],
+        ["Тема 10. ИЗБИРАТЕЛЬНАЯ СИСТЕМА", "Что такое избирательная система?", "Порядок выборов в представительные учреждения и выборных должностных лиц, а также определение результатов голосования."],
+        ["Тема 10. ИЗБИРАТЕЛЬНАЯ СИСТЕМА", "Из каких двух компонентов состоит избирательная система?", "Избирательное право и избирательный процесс."],
+        ["Тема 10. ИЗБИРАТЕЛЬНАЯ СИСТЕМА", "Что такое активное избирательное право?", "Право граждан участвовать в выборах в качестве избирателей (голосовать)."],
+        ["Тема 10. ИЗБИРАТЕЛЬНАЯ СИСТЕМА", "Что такое пассивное избирательное право?", "Право граждан быть избранными в органы государственной власти и местного самоуправления."],
+        ["Тема 10. ИЗБИРАТЕЛЬНАЯ СИСТЕМА", "Перечислите принципы демократических выборов в РФ.", "К ним относятся: всеобщее, равное и прямое избирательное право при тайном голосовании."],
+        ["Тема 10. ИЗБИРАТЕЛЬНАЯ СИСТЕМА", "Что такое избирательная кампания?", "Деятельность по подготовке и проведению выборов."],
+        ["Тема 10. ИЗБИРАТЕЛЬНАЯ СИСТЕМА", "В чем суть мажоритарной избирательной системы?", "Избиратели голосуют за конкретного кандидата, а побеждает набравший большинство голосов."],
+        ["Тема 10. ИЗБИРАТЕЛЬНАЯ СИСТЕМА", "Что характерно для пропорциональной избирательной системы?", "Голосование идет за партийные списки, а места распределяются пропорционально набранным голосам (есть избирательный барьер)."],
+        ["Тема 10. ИЗБИРАТЕЛЬНАЯ СИСТЕМА", "Что такое избирательный барьер?", "Минимальный процент голосов, который должна набрать партия для прохождения в парламент при пропорциональной системе."],
+        ["Тема 10. ИЗБИРАТЕЛЬНАЯ СИСТЕМА", "Что такое смешанная избирательная система?", "Система, при которой часть депутатов избирается по мажоритарному округу, а другая часть – по партийным спискам."],
+        ["Тема 11. ПОЛИТИЧЕСКОЕ УЧАСТИЕ", "Что такое политическое участие?", "Действия гражданина с целью влияния на принятие и реализацию государственных решений, выбор представителей в институты власти."],
+        ["Тема 11. ПОЛИТИЧЕСКОЕ УЧАСТИЕ", "Приведите примеры прямого (непосредственного) политического участия.", "К ним относятся: участие в выборах и референдумах, посещение митингов, обращение в органы власти."],
+        ["Тема 11. ПОЛИТИЧЕСКОЕ УЧАСТИЕ", "Что такое представительное (опосредованное) политическое участие?", "Осуществление власти через избранных представителей (депутатов)."],
+        ["Тема 11. ПОЛИТИЧЕСКОЕ УЧАСТИЕ", "Что такое политическая культура?", "Уровень и характер политических взглядов, знаний и убеждений граждан, степень их политической активности."],
+        ["Тема 11. ПОЛИТИЧЕСКОЕ УЧАСТИЕ", "Что такое абсентеизм?", "Сознательное уклонение граждан от участия в политических действиях (отказ от голосования на выборах)."],
+        ["Тема 11. ПОЛИТИЧЕСКОЕ УЧАСТИЕ", "Назовите основные причины абсентеизма.", "К ним относятся: недоверие к политикам, падение уровня жизни, уверенность в том, что от голоса ничего не зависит."],
+        ["Тема 12. ПОЛИТИЧЕСКАЯ ЭЛИТА", "Что такое политическая элита?", "Относительно немногочисленная социальная группа, сосредоточившая в своих руках значительный объем политической власти."],
+        ["Тема 12. ПОЛИТИЧЕСКАЯ ЭЛИТА", "Назовите причины возникновения политической элиты.", "Необходимость профессионального управления обществом, политическая пассивность большинства, неравенство в доступе к ресурсам."],
+        ["Тема 12. ПОЛИТИЧЕСКАЯ ЭЛИТА", "Какие функции выполняет политическая элита?", "К ним относятся: определение целей развития общества, принятие политических решений, выдвижение лидеров."],
+        ["Тема 12. ПОЛИТИЧЕСКАЯ ЭЛИТА", "Как политическая элита делится по отношению к власти?", "На правящую элиту и контрэлиту (оппозиционную элиту)."],
+        ["Тема 12. ПОЛИТИЧЕСКАЯ ЭЛИТА", "Какие два основных пути рекрутирования (отбора) элит существуют?", "Закрытая (гильдейская) система и открытая (антрепренерская) система."],
+        ["Тема 13. ПОЛИТИЧЕСКОЕ ЛИДЕРСТВО", "Что такое политическое лидерство?", "Способность определенного лица решающим образом постоянно влиять на все общество, группу, организацию."],
+        ["Тема 13. ПОЛИТИЧЕСКОЕ ЛИДЕРСТВО", "Кто такой политический лидер?", "Ведущий субъект политического процесса, осуществляющий объединение и сплочение социальных сил."],
+        ["Тема 13. ПОЛИТИЧЕСКОЕ ЛИДЕРСТВО", "Каковы основные функции политического лидера?", "Интегративная (объединение общества), ориентационная (выработка курса), коммуникативная (связь власти и масс)."],
+        ["Тема 13. ПОЛИТИЧЕСКОЕ ЛИДЕРСТВО", "Как делятся политические лидеры по способу легитимации власти?", "На традиционных, харизматических и рационально-легальных."],
+        ["Тема 13. ПОЛИТИЧЕСКОЕ ЛИДЕРСТВО", "Приведите пример традиционного лидерства.", "Власть монарха, опирающаяся на обычаи и веру в святость традиций."],
+        ["Тема 13. ПОЛИТИЧЕСКОЕ ЛИДЕРСТВО", "Чем отличается рационально-легальное лидерство?", "Лидер получает власть законным путем через выборы, его полномочия ограничены конституцией."],
+        ["Тема 13. ПОЛИТИЧЕСКОЕ ЛИДЕРСТВО", "Назовите типы лидерства по стилю управления.", "Демократическое и авторитарное."],
+        ["Тема 14. ПОЛИТИЧЕСКИЙ ПРОЦЕСС", "Что такое политический процесс?", "Совокупность действий субъектов политики, направленных на осуществление своих ролей и функций в рамках политической системы."],
+        ["Тема 14. ПОЛИТИЧЕСКИЙ ПРОЦЕСС", "Кого относят к субъектам политического процесса?", "К ним относятся: государство, политические партии, граждане (электорат), политические лидеры."],
+        ["Тема 14. ПОЛИТИЧЕСКИЙ ПРОЦЕСС", "Назовите основные стадии политического процесса.", "Выявление проблемы, принятие решения, исполнение решения, контроль за исполнением и оценка результатов."],
+        ["Тема 15. СМИ В ПОЛИТИЧЕСКОЙ СИСТЕМЕ", "Что такое средства массовой информации (СМИ)?", "Организационно-технические комплексы быстрой передачи и массового тиражирования информации."],
+        ["Тема 15. СМИ В ПОЛИТИЧЕСКОЙ СИСТЕМЕ", "Перечислите отличительные признаки СМИ.", "Сбор и обработка информации, периодичность работы, неограниченный круг потребителей (массовость)."],
+        ["Тема 15. СМИ В ПОЛИТИЧЕСКОЙ СИСТЕМЕ", "Каковы основные функции СМИ в политике?", "К ним относятся: информационная, формирование общественного мнения, политическая социализация, критика власти."],
+        ["Тема 15. СМИ В ПОЛИТИЧЕСКОЙ СИСТЕМЕ", "Почему СМИ часто называют «четвертой властью»?", "Из-за их огромного влияния на общество и способности формировать политические взгляды и настроения граждан."],
+        ["Тема 15. СМИ В ПОЛИТИЧЕСКОЙ СИСТЕМЕ", "Что такое цензура?", "Прямой или косвенный контроль со стороны государства за содержанием информации, распространяемой СМИ."]
+      ],
+      "s5_1": [
+        ["Тема 1. ПОНЯТИЕ И ПРИЗНАКИ ПРАВА", "Что такое право?", "Это система общеобязательных, формально определенных норм, установленных и охраняемых государством."],
+        ["Тема 1. ПОНЯТИЕ И ПРИЗНАКИ ПРАВА", "Какова главная цель права?", "Регулирование общественных отношений и поддержание порядка в государстве."],
+        ["Тема 1. ПОНЯТИЕ И ПРИЗНАКИ ПРАВА", "Назовите основные признаки права.", "К ним относятся: общеобязательность, формальная определенность, обеспеченность силой государства, системность."],
+        ["Тема 1. ПОНЯТИЕ И ПРИЗНАКИ ПРАВА", "Что означает признак «формальная определенность» права?", "Нормы права закреплены в официальных письменных документах (законах, кодексах)."],
+        ["Тема 1. ПОНЯТИЕ И ПРИЗНАКИ ПРАВА", "Что означает признак «общеобязательность» права?", "Нормы права обязательны для исполнения всеми гражданами, организациями и государственными органами."],
+        ["Тема 1. ПОНЯТИЕ И ПРИЗНАКИ ПРАВА", "В чем отличие норм права от норм морали по способу обеспечения?", "Нормы права обеспечиваются принудительной силой государства, а мораль – силой общественного мнения."],
+        ["Тема 1. ПОНЯТИЕ И ПРИЗНАКИ ПРАВА", "В чем отличие норм права от норм морали по форме выражения?", "Право всегда закреплено в официальных документах, а мораль существует в сознании людей."],
+        ["Тема 1. ПОНЯТИЕ И ПРИЗНАКИ ПРАВА", "Что такое объективное право?", "Это система действующих в государстве правовых норм."],
+        ["Тема 1. ПОНЯТИЕ И ПРИЗНАКИ ПРАВА", "Что такое субъективное право?", "Официально признанные возможности, которыми располагает конкретный человек (например, право на образование)."],
+        ["Тема 2. ФУНКЦИИ ПРАВА. СТРУКТУРА ПРАВОВОЙ НОРМЫ И ВИДЫ.", "Каковы основные функции права?", "К ним относятся: регулятивная, охранительная, воспитательная и оценочная."],
+        ["Тема 2. ФУНКЦИИ ПРАВА. СТРУКТУРА ПРАВОВОЙ НОРМЫ И ВИДЫ.", "В чем заключается регулятивная функция права?", "В упорядочивании общественных отношений и установлении правил поведения."],
+        ["Тема 2. ФУНКЦИИ ПРАВА. СТРУКТУРА ПРАВОВОЙ НОРМЫ И ВИДЫ.", "В чем заключается охранительная функция права?", "В защите наиболее важных общественных отношений и наказании правонарушителей."],
+        ["Тема 2. ФУНКЦИИ ПРАВА. СТРУКТУРА ПРАВОВОЙ НОРМЫ И ВИДЫ.", "Что такое норма права?", "Установленное государством общеобязательное правило поведения, регулирующее конкретное общественное отношение."],
+        ["Тема 2. ФУНКЦИИ ПРАВА. СТРУКТУРА ПРАВОВОЙ НОРМЫ И ВИДЫ.", "Назовите три элемента структуры правовой нормы.", "К ним относятся: гипотеза, диспозиция и санкция."],
+        ["Тема 2. ФУНКЦИИ ПРАВА. СТРУКТУРА ПРАВОВОЙ НОРМЫ И ВИДЫ.", "Что такое гипотеза в структуре правовой нормы?", "Элемент, указывающий на жизненные обстоятельства, при которых норма вступает в действие."],
+        ["Тема 2. ФУНКЦИИ ПРАВА. СТРУКТУРА ПРАВОВОЙ НОРМЫ И ВИДЫ.", "Что такое диспозиция в структуре правовой нормы?", "Само правило поведения, права и обязанности субъектов."],
+        ["Тема 2. ФУНКЦИИ ПРАВА. СТРУКТУРА ПРАВОВОЙ НОРМЫ И ВИДЫ.", "Что такое санкция в структуре правовой нормы?", "Неблагоприятные последствия, наступающие за нарушение правила (диспозиции)."],
+        ["Тема 2. ФУНКЦИИ ПРАВА. СТРУКТУРА ПРАВОВОЙ НОРМЫ И ВИДЫ.", "На какие виды делятся нормы права по характеру предписания?", "На управомочивающие, обязывающие и запрещающие."],
+        ["Тема 2. ФУНКЦИИ ПРАВА. СТРУКТУРА ПРАВОВОЙ НОРМЫ И ВИДЫ.", "Приведите пример запрещающей нормы права.", "Закон запрещает управлять автомобилем в состоянии алкогольного опьянения."],
+        ["Тема 3. ИСТОЧНИКИ ПРАВА", "Что такое источник (форма) права?", "Официально закрепленные формы внешнего выражения содержания права."],
+        ["Тема 3. ИСТОЧНИКИ ПРАВА", "Назовите основные источники права.", "К ним относятся: правовой обычай, судебный прецедент, нормативный договор, нормативный правовой акт."],
+        ["Тема 3. ИСТОЧНИКИ ПРАВА", "Что такое правовой обычай?", "Исторически сложившееся правило поведения, санкционированное государством."],
+        ["Тема 3. ИСТОЧНИКИ ПРАВА", "Что такое судебный прецедент?", "Решение суда по конкретному делу, которое становится правилом для разрешения аналогичных дел в будущем."],
+        ["Тема 3. ИСТОЧНИКИ ПРАВА", "Что такое нормативный правовой акт (НПА)?", "Официальный документ, изданный государственным органом и содержащий правовые нормы."],
+        ["Тема 3. ИСТОЧНИКИ ПРАВА", "На какие два основных вида делятся нормативные правовые акты?", "На законы и подзаконные акты."],
+        ["Тема 3. ИСТОЧНИКИ ПРАВА", "Что такое закон?", "Нормативный правовой акт, принятый высшим законодательным органом власти и обладающий высшей юридической силой."],
+        ["Тема 3. ИСТОЧНИКИ ПРАВА", "Что такое подзаконный акт?", "Нормативный документ, изданный на основе и во исполнение законов (указы, постановления, приказы)."],
+        ["Тема 4. ПРАВООТНОШЕНИЯ", "Что такое правоотношения?", "Общественные отношения, урегулированные нормами права, участники которых имеют взаимные права и обязанности."],
+        ["Тема 4. ПРАВООТНОШЕНИЯ", "Назовите элементы структуры правоотношения.", "К ним относятся: субъекты, объект и содержание правоотношения."],
+        ["Тема 4. ПРАВООТНОШЕНИЯ", "Кто может быть субъектом правоотношений?", "Физические лица, юридические лица и публично-правовые образования (государство)."],
+        ["Тема 4. ПРАВООТНОШЕНИЯ", "Что является объектом правоотношения?", "Материальные и нематериальные блага, по поводу которых возникает правоотношение."],
+        ["Тема 4. ПРАВООТНОШЕНИЯ", "Что включает в себя содержание правоотношения?", "Субъективные права и юридические обязанности участников."],
+        ["Тема 4. ПРАВООТНОШЕНИЯ", "Что такое правоспособность?", "Установленная законом способность лица иметь субъективные права и нести юридические обязанности."],
+        ["Тема 4. ПРАВООТНОШЕНИЯ", "С какого момента возникает правоспособность у физического лица?", "С момента рождения (и прекращается со смертью)."],
+        ["Тема 4. ПРАВООТНОШЕНИЯ", "Что такое дееспособность?", "Способность лица своими действиями приобретать и осуществлять права, создавать и исполнять обязанности."],
+        ["Тема 4. ПРАВООТНОШЕНИЯ", "С какого возраста наступает полная дееспособность в РФ?", "С 18 лет (по общему правилу)."],
+        ["Тема 4. ПРАВООТНОШЕНИЯ", "Что такое эмансипация в праве?", "Объявление несовершеннолетнего, достигшего 16 лет, полностью дееспособным (при работе по найму или занятии бизнесом)."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "Что такое правонарушение?", "Общественно опасное виновное деяние, противоречащее нормам права и наносящее вред обществу."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "Назовите основные признаки правонарушения.", "К ним относятся: деяние (действие или бездействие), противоправность, виновность, общественная опасность."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "На какие два вида делятся правонарушения по степени опасности?", "На преступления и проступки."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "Что такое преступление?", "Наиболее общественно опасное виновное деяние, запрещенное уголовным законодательством."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "Что такое проступок?", "Виновное деяние, имеющее меньшую степень общественной опасности по сравнению с преступлением."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "Назовите виды проступков.", "К ним относятся: дисциплинарные, административные и гражданско-правовые."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "Что такое юридическая ответственность?", "Применение мер государственного принуждения к виновному лицу за совершенное правонарушение."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "Каковы основные цели юридической ответственности?", "К ним относятся: карательная (штрафная), превентивная (предупредительная) и восстановительная."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "Назовите основные виды юридической ответственности.", "К ним относятся: уголовная, административная, гражданско-правовая, дисциплинарная, материальная."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "За какие деяния наступает уголовная ответственность?", "Только за совершение преступлений, предусмотренных Уголовным кодексом."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "Каковы меры дисциплинарной ответственности по Трудовому кодексу РФ?", "К ним относятся: замечание, выговор, увольнение."],
+        ["Тема 5. ЮРИДИЧЕСКАЯ ОТВЕТСТВЕННОСТЬ", "Какова основная цель гражданско-правовой ответственности?", "Полное возмещение причиненного имущественного вреда."],
+        ["Тема 6. СИСТЕМА ПРАВА РОССИЙКОЙ ФЕДЕРАЦИИ", "Что такое система права?", "Внутренняя структура права, выражающаяся в единстве и согласованности норм и их разделении на отрасли и институты."],
+        ["Тема 6. СИСТЕМА ПРАВА РОССИЙКОЙ ФЕДЕРАЦИИ", "Назовите основные элементы системы права.", "К ним относятся: норма права, институт права и отрасль права."],
+        ["Тема 6. СИСТЕМА ПРАВА РОССИЙКОЙ ФЕДЕРАЦИИ", "Что такое отрасль права?", "Совокупность правовых норм, регулирующих самостоятельную сферу общественных отношений."],
+        ["Тема 6. СИСТЕМА ПРАВА РОССИЙКОЙ ФЕДЕРАЦИИ", "Что такое институт права?", "Обособленный комплекс правовых норм внутри отрасли, регулирующий определенный вид однородных отношений."],
+        ["Тема 6. СИСТЕМА ПРАВА РОССИЙКОЙ ФЕДЕРАЦИИ", "На какие две большие группы делится право по характеру интересов?", "На публичное и частное право."],
+        ["Тема 6. СИСТЕМА ПРАВА РОССИЙКОЙ ФЕДЕРАЦИИ", "Что характерно для публичного права?", "Оно защищает государственные интересы и основано на отношениях власти и подчинения (императивный метод)."],
+        ["Тема 6. СИСТЕМА ПРАВА РОССИЙКОЙ ФЕДЕРАЦИИ", "Какие отрасли относятся к публичному праву?", "К ним относятся: конституционное, административное, уголовное, финансовое право."],
+        ["Тема 6. СИСТЕМА ПРАВА РОССИЙКОЙ ФЕДЕРАЦИИ", "Что характерно для частного права?", "Оно защищает частные интересы и основано на равенстве и автономии сторон (диспозитивный метод)."],
+        ["Тема 6. СИСТЕМА ПРАВА РОССИЙКОЙ ФЕДЕРАЦИИ", "Какие отрасли относятся к частному праву?", "К ним относятся: гражданское, семейное, предпринимательское право."],
+        ["Тема 6. СИСТЕМА ПРАВА РОССИЙКОЙ ФЕДЕРАЦИИ", "Что такое материальное право?", "Отрасли права, которые непосредственно регулируют общественные отношения (устанавливают права и обязанности)."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Что такое конституционное право?", "Ведущая отрасль права, закрепляющая основы конституционного строя, права и свободы граждан."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Что такое Конституция?", "Основной закон государства, обладающий высшей юридической силой и прямым действием."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "В каком году была принята действующая Конституция РФ?", "В 1993 году (на всенародном голосовании)."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Что означает характеристика РФ как демократического государства?", "Единственным источником власти в стране является ее многонациональный народ."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Что означает характеристика РФ как социального государства?", "Политика государства направлена на создание условий, обеспечивающих достойную жизнь и свободное развитие человека."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Что означает характеристика РФ как светского государства?", "Никакая религия не может устанавливаться в качестве государственной или обязательной."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "На какие три основные группы делятся права и свободы человека и гражданина в РФ?", "На личные (гражданские), политические, социально-экономические и культурные."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Приведите примеры личных (гражданских) прав.", "К ним относятся: право на жизнь, свободу и личную неприкосновенность, неприкосновенность жилища, свободу передвижения."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Приведите примеры политических прав.", "К ним относятся: право избирать и быть избранным, право на мирные собрания и митинги, право на объединение."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Приведите примеры социально-экономических прав.", "К ним относятся: право на частную собственность, свободу предпринимательства, право на труд и отдых."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Перечислите основные конституционные обязанности граждан РФ.", "К ним относятся: соблюдение законов, уплата налогов, защита Отечества, сохранение природы, забота о детях и нетрудоспособных родителях."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Является ли получение основного общего образования обязанностью гражданина РФ?", "Да, это прямо закреплено в Конституции РФ."],
+        ["Тема 7. КОНСТИТУЦИОННОЕ ПРАВО", "Что такое гражданство?", "Устойчивая политико-правовая связь человека с государством, выражающаяся в совокупности их взаимных прав и обязанностей."],
+        ["Тема 8. СЕМЕЙНОЕ ПРАВО", "Что регулирует семейное право?", "Личные неимущественные и имущественные отношения между членами семьи (супругами, родителями, детьми)."],
+        ["Тема 8. СЕМЕЙНОЕ ПРАВО", "Что такое брак по семейному праву?", "Свободный и добровольный союз мужчины и женщины, зарегистрированный в органах ЗАГС."],
+        ["Тема 8. СЕМЕЙНОЕ ПРАВО", "Назовите обязательные условия заключения брака в РФ.", "Взаимное добровольное согласие мужчины и женщины, достижение ими брачного возраста (18 лет)."],
+        ["Тема 8. СЕМЕЙНОЕ ПРАВО", "Назовите обстоятельства, препятствующие заключению брака.", "К ним относятся: состояние в другом браке, близкое родство, усыновление, недееспособность одного из лиц."],
+        ["Тема 8. СЕМЕЙНОЕ ПРАВО", "Как делится имущество, нажитое супругами во время брака?", "Оно является их совместной собственностью и делится поровну, если иное не предусмотрено брачным договором."],
+        ["Тема 8. СЕМЕЙНОЕ ПРАВО", "Какое имущество признается личной собственностью супруга?", "Имущество, принадлежавшее ему до брака, а также полученное в дар или по наследству во время брака."],
+        ["Тема 8. СЕМЕЙНОЕ ПРАВО", "Что такое брачный договор?", "Соглашение лиц, вступающих в брак, или соглашение супругов, определяющее их имущественные права и обязанности."],
+        ["Тема 8. СЕМЕЙНОЕ ПРАВО", "Может ли брачный договор регулировать личные неимущественные отношения?", "Нет, он регулирует исключительно имущественные вопросы."],
+        ["Тема 8. СЕМЕЙНОЕ ПРАВО", "В какой форме заключается брачный договор?", "Он заключается в письменной форме и подлежит обязательному нотариальному удостоверению."],
+        ["Тема 8. СЕМЕЙНОЕ ПРАВО", "В каких случаях расторжение брака производится только через суд?", "При наличии общих несовершеннолетних детей или при отсутствии согласия одного из супругов."]
+      ],
+      "s5_2": [
+        ["Тема 9. ГРАЖДАНСКОЕ ПРАВО", "Что регулирует гражданское право?", "Имущественные и личные неимущественные отношения, основанные на равенстве сторон."],
+        ["Тема 9. ГРАЖДАНСКОЕ ПРАВО", "Кто является субъектами гражданского права?", "К ним относятся: физические лица, юридические лица и публично-правовые образования."],
+        ["Тема 9. ГРАЖДАНСКОЕ ПРАВО", "Что такое юридическое лицо?", "Организация, которая имеет обособленное имущество и отвечает им по своим обязательства."],
+        ["Тема 9. ГРАЖДАНСКОЕ ПРАВО", "Что такое сделка?", "Действия граждан и юридических лиц, направленные на установление, изменение или прекращение гражданских прав и обязанностей."],
+        ["Тема 9. ГРАЖДАНСКОЕ ПРАВО", "Что такое договор?", "Соглашение двух или нескольких лиц об установлении, изменении или прекращении гражданских прав и обязанностей."],
+        ["Тема 9. ГРАЖДАНСКОЕ ПРАВО", "Что такое право собственности?", "Совокупность прав владения, пользования и распоряжения имуществом."],
+        ["Тема 9. ГРАЖДАНСКОЕ ПРАВО", "Что такое право владения?", "Фактическое обладание вещью."],
+        ["Тема 9. ГРАЖДАНСКОЕ ПРАВО", "Что такое право пользования?", "Возможность извлекать из вещи ее полезные свойства."],
+        ["Тема 9. ГРАЖДАНСКОЕ ПРАВО", "Что такое право распоряжения?", "Возможность определять юридическую судьбу вещи (продавать, дарить, завещать)."],
+        ["Тема 9. ГРАЖДАНСКОЕ ПРАВО", "Что такое наследование?", "Переход имущества, прав и связанных с ними обязанностей умершего лица к его наследникам."],
+        ["Тема 10. ТРУДОВОЕ ПРАВО", "Что регулирует трудовое право?", "Отношения между работником и работодателем, основанные на трудовом договоре."],
+        ["Тема 10. ТРУДОВОЕ ПРАВО", "Что такое трудовой договор?", "Соглашение между работодателем и работником, определяющее их взаимные права и обязанности."],
+        ["Тема 10. ТРУДОВОЕ ПРАВО", "С какого возраста по общему правилу допускается заключение трудового договора?", "С 16 лет."],
+        ["Тема 10. ТРУДОВОЕ ПРАВО", "Какова нормальная продолжительность рабочего времени в РФ?", "Не более 40 часов в неделю."],
+        ["Тема 10. ТРУДОВОЕ ПРАВО", "Для кого устанавливается сокращенная продолжительность рабочего времени?", "К ним относятся: несовершеннолетние, инвалиды и работники с вредными условиями труда."],
+        ["Тема 10. ТРУДОВОЕ ПРАВО", "Что такое испытательный срок?", "Период времени, в течение которого работодатель проверяет соответствие работника поручаемой работе (по общему правилу – не более 3 месяцев)."],
+        ["Тема 10. ТРУДОВОЕ ПРАВО", "Назовите основные виды времени отдыха по Трудовому кодексу РФ.", "К ним относятся: перерывы в течение рабочего дня, выходные дни, праздничные дни, отпуска."],
+        ["Тема 10. ТРУДОВОЕ ПРАВО", "Что такое дисциплинарный проступок?", "Неисполнение или ненадлежащее исполнение работником по его вине возложенных на него трудовых обязанностей."],
+        ["Тема 11. УГОЛОВНОЕ ПРАВО", "Что регулирует уголовное право?", "Общественные отношения, связанные с совершением преступлений и назначением наказания."],
+        ["Тема 11. УГОЛОВНОЕ ПРАВО", "Что является единственным источником уголовного права в РФ?", "Уголовный кодекс Российской Федерации (УК РФ)."],
+        ["Тема 11. УГОЛОВНОЕ ПРАВО", "Что такое преступление?", "Виновно совершенное общественно опасное деяние, запрещенное Уголовным кодексом под угрозой наказания."],
+        ["Тема 11. УГОЛОВНОЕ ПРАВО", "С какого возраста наступает общая уголовная ответственность?", "С 16 лет."],
+        ["Тема 11. УГОЛОВНОЕ ПРАВО", "С какого возраста наступает уголовная ответственность за особо тяжкие преступления (убийство, кража, разбой)?", "С 14 лет."],
+        ["Тема 11. УГОЛОВНОЕ ПРАВО", "Что такое соучастие в преступлении?", "Умышленное совместное участие двух или более лиц в совершении умышленного преступления."],
+        ["Тема 11. УГОЛОВНОЕ ПРАВО", "Назовите виды соучастников преступления.", "К ним относятся: исполнитель, организатор, подстрекатель, пособник."],
+        ["Тема 11. УГОЛОВНОЕ ПРАВО", "Что такое необходимая оборона?", "Правомерная защита личности и прав обороняющегося от общественно опасного посягательства."],
+        ["Тема 11. УГОЛОВНОЕ ПРАВО", "Назовите основные виды уголовных наказаний.", "К ним относятся: штраф, обязательные работы, исправительные работы, лишение свободы."],
+        ["Тема 12. АДМИНИСТРАТИВНОЕ ПРАВО", "Что регулирует административное право?", "Общественные отношения в сфере государственного управления и деятельности исполнительной власти."],
+        ["Тема 12. АДМИНИСТРАТИВНОЕ ПРАВО", "Что такое административное правонарушение?", "Противоправное, виновное действие или бездействие, за которое установлена административная ответственность."],
+        ["Тема 12. АДМИНИСТРАТИВНОЕ ПРАВО", "С какого возраста наступает административная ответственность?", "С 16 лет."],
+        ["Тема 12. АДМИНИСТРАТИВНОЕ ПРАВО", "Приведите примеры административных правонарушений.", "К ним относятся: нарушение правил дорожного движения, мелкое хулиганство, безбилетный проезд."],
+        ["Тема 12. АДМИНИСТРАТИВНОЕ ПРАВО", "Что такое административное наказание?", "Установленная государством мера ответственности за совершение административного правонарушения."],
+        ["Тема 12. АДМИНИСТРАТИВНОЕ ПРАВО", "Назовите виды административных наказаний.", "К ним относятся: предупреждение, административный штраф, лишение специального права, административный арест."],
+        ["Тема 12. АДМИНИСТРАТИВНОЕ ПРАВО", "Кем применяются административные наказания?", "Судами, органами внутренних дел (полицией), налоговыми и таможенными органами."],
+        ["Тема 13. ПРОЦЕССУАЛЬНОЕ ПРАВО", "Что такое процессуальное право?", "Нормы, определяющие порядок (процедуру) применения норм материального права и разрешения споров."],
+        ["Тема 13. ПРОЦЕССУАЛЬНОЕ ПРАВО", "Что такое гражданский процесс?", "Порядок рассмотрения и разрешения гражданских дел в суде."],
+        ["Тема 13. ПРОЦЕССУАЛЬНОЕ ПРАВО", "Кто является сторонами в гражданском процессе?", "Истец (тот, кто подает иск) и ответчик (к кому предъявлен иск)."],
+        ["Тема 13. ПРОЦЕССУАЛЬНОЕ ПРАВО", "Что такое уголовный процесс?", "Деятельность органов дознания, следствия, прокуратуры и суда по расследованию и разрешению уголовных дел."],
+        ["Тема 13. ПРОЦЕССУАЛЬНОЕ ПРАВО", "Кто выступает на стороне обвинения в уголовном процессе?", "К ним относятся: прокурор, следователь, дознаватель, потерпевший."],
+        ["Тема 13. ПРОЦЕССУАЛЬНОЕ ПРАВО", "Кто выступает на стороне защиты в уголовном процессе?", "К ним относятся: подозреваемый, обвиняемый, подсудимый, защитник (адвокат)."],
+        ["Тема 13. ПРОЦЕССУАЛЬНОЕ ПРАВО", "Что такое презумпция невиновности?", "Принцип, согласно которому обвиняемый считается невиновным, пока его вина не будет доказана в законном порядке."],
+        ["Тема 14. ГРАЖДАНСТВО", "Что такое гражданство?", "Устойчивая политико-правовая связь человека с государством, выражающаяся в совокупности их взаимных прав и обязанностей."],
+        ["Тема 14. ГРАЖДАНСТВО", "Каковы основные принципы гражданства РФ?", "Гражданство является единым и равным независимо от оснований его приобретения."],
+        ["Тема 14. ГРАЖДАНСТВО", "Может ли гражданин РФ быть лишен своего гражданства или права изменить его?", "Нет, это прямо запрещено Конституцией РФ."],
+        ["Тема 14. ГРАЖДАНСТВО", "Что такое филиация?", "Приобретение гражданства по рождению."],
+        ["Тема 14. ГРАЖДАНСТВО", "Что такое натурализация?", "Прием в гражданство иностранного гражданина или лица без гражданства по их заявлению."],
+        ["Тема 14. ГРАЖДАНСТВО", "Каков общий срок проживания в РФ для приема в гражданство (натурализации)?", "Пять лет непрерывно с момента получения вида на жительство."],
+        ["Тема 14. ГРАЖДАНСТВО", "Кто такие апатриды?", "Лица без гражданства."],
+        ["Тема 15. ПРАВООХРАНИТЕЛЬНЫЕ ОРГАНЫ И СУДЕБНАЯ СИСТЕМА", "Что такое правоохранительные органы?", "Государственные органы, основной функцией которых является охрана законности и правопорядка, защита прав и свобод человека."],
+        ["Тема 15. ПРАВООХРАНИТЕЛЬНЫЕ ОРГАНЫ И СУДЕБНАЯ СИСТЕМА", "Назовите основные правоохранительные органы РФ.", "К ним относятся: суд, прокуратура, полиция, следственный комитет, адвокатура, нотариат."],
+        ["Тема 15. ПРАВООХРАНИТЕЛЬНЫЕ ОРГАНЫ И СУДЕБНАЯ СИСТЕМА", "В чем заключается основная функция прокуратуры?", "В осуществлении надзора за точным и единообразным исполнением законов."],
+        ["Тема 15. ПРАВООХРАНИТЕЛЬНЫЕ ОРГАНЫ И СУДЕБНАЯ СИСТЕМА", "Каковы функции полиции?", "Защита жизни, здоровья и имущества граждан, охрана общественного порядка, раскрытие преступлений."],
+        ["Тема 15. ПРАВООХРАНИТЕЛЬНЫЕ ОРГАНЫ И СУДЕБНАЯ СИСТЕМА", "Для чего нужна адвокатура?", "Для оказания квалифицированной юридической помощи физическим и юридическим лицам."],
+        ["Тема 15. ПРАВООХРАНИТЕЛЬНЫЕ ОРГАНЫ И СУДЕБНАЯ СИСТЕМА", "Каковы функции нотариата?", "Удостоверение сделок, оформление наследственных прав и заверение копий документов."],
+        ["Тема 15. ПРАВООХРАНИТЕЛЬНЫЕ ОРГАНЫ И СУДЕБНАЯ СИСТЕМА", "В чем исключительность судебной власти?", "Правосудие в РФ осуществляется только судом, никто другой не может признать человека виновным в преступлении."],
+        ["Тема 16. МЕЖДУНАРОДНОЕ ПРАВО", "Что такое международное право?", "Система юридических норм, регулирующих отношения между государствами и международными организациями."],
+        ["Тема 16. МЕЖДУНАРОДНОЕ ПРАВО", "Что является основным источником международного права?", "Международный договор (соглашение) и международный обычай."],
+        ["Тема 16. МЕЖДУНАРОДНОЕ ПРАВО", "Что такое международное гуманитарное право?", "Отрасль международного права, регулирующая правила ведения вооруженных конфликтов и защищающая жертв войны."],
+        ["Тема 16. МЕЖДУНАРОДНОЕ ПРАВО", "Какова главная цель международного гуманитарного права?", "Гуманизация вооруженных конфликтов и ограничение использования жестоких средств ведения войны."],
+        ["Тема 16. МЕЖДУНАРОДНОЕ ПРАВО", "Кого защищает международное гуманитарное право?", "Мирное население, раненых, больных и военнопленных."],
+        ["Тема 16. МЕЖДУНАРОДНОЕ ПРАВО", "Назовите основные принципы международного права.", "К ним относятся: суверенное равенство государств, неприменение силы, нерушимость границ, мирное разрешение споров."],
+        ["Тема 16. МЕЖДУНАРОДНОЕ ПРАВО", "Какая международная организация играет главную роль в поддержании мира и безопасности?", "Организация Объединенных Наций (ООН)."]
+      ]
+    };
+
+    const databases = {};
+    for (const [sectionKey, dataArray] of Object.entries(rawData)) {
+      databases[sectionKey] = dataArray.map((item, index) => ({
+        id: `${sectionKey}_${index}`,
+        topic: item[0],
+        question: item[1],
+        answer: item[2]
+      }));
     }
 
-    function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.getAttribute('data-theme') === 'dark';
-      const newTheme = isDark ? 'light' : 'dark';
-      
-      html.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      updateThemeIcon(newTheme);
+    let currentDbKey = 's1';
+    let cards = [...databases[currentDbKey]];
+    let learnedIds = new Set();
+    let activeTab = 'all';
+    let currentIndex = 0;
+    let isFlipped = false;
+    let theme = 'light';
+
+    const els = {
+      startScreen: document.getElementById('start-screen'),
+      btnBigStart: document.getElementById('btn-big-start'),
+      appContainer: document.getElementById('app-container'),
+      cardWrapper: document.getElementById('card-wrapper'),
+      badgeLeft: document.getElementById('badge-left'),
+      badgeRight: document.getElementById('badge-right'),
+      cardQuestion: document.getElementById('card-question'),
+      cardAnswer: document.getElementById('card-answer'),
+      cardTopicHint: document.getElementById('card-topic-hint'),
+      tabAll: document.getElementById('tab-all'),
+      tabLearning: document.getElementById('tab-learning'),
+      tabLearned: document.getElementById('tab-learned'),
+      statusText: document.getElementById('status-text'),
+      btnCheck: document.getElementById('btn-check'),
+      themeIconUse: document.getElementById('theme-icon-use'),
+      btnTheme: document.getElementById('btn-theme'),
+      btnFullscreen: document.getElementById('btn-fullscreen'),
+      fullscreenIconUse: document.getElementById('fullscreen-icon-use'),
+      emptyState: document.getElementById('empty-state'),
+      mainContent: document.getElementById('main-content'),
+      btnNext: document.getElementById('btn-next'),
+      btnPrev: document.getElementById('btn-prev'),
+      btnShuffle: document.getElementById('btn-shuffle'),
+      sectionSelector: document.getElementById('section-selector'),
+      fileStatusText: document.getElementById('file-status-text')
+    };
+
+    function requestFullScreenSafe(element) {
+      try {
+        if (element.requestFullscreen) {
+          element.requestFullscreen().catch(err => console.warn('Fullscreen err:', err));
+        } else if (element.webkitRequestFullscreen) {
+          element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) {
+          element.msRequestFullscreen();
+        }
+      } catch (e) {
+        console.warn('API не поддерживается:', e);
+      }
     }
 
-    function updateThemeIcon(theme) {
-      const sun = document.getElementById('sun-icon');
-      const moon = document.getElementById('moon-icon');
-      
-      if (theme === 'dark') {
-        sun.style.display = 'block';
-        moon.style.display = 'none';
+    els.btnBigStart.addEventListener('click', () => {
+      requestFullScreenSafe(document.documentElement);
+      els.startScreen.classList.add('hidden');
+      updateUI();
+      scaleTextToFit();
+    });
+
+    els.btnFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        requestFullScreenSafe(document.documentElement);
       } else {
-        sun.style.display = 'none';
-        moon.style.display = 'block';
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    });
+
+    function updateFullscreenIcon() {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        els.fullscreenIconUse.setAttribute('href', '#icon-minimize');
+      } else {
+        els.fullscreenIconUse.setAttribute('href', '#icon-maximize');
+      }
+    }
+    
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+
+    els.sectionSelector.addEventListener('change', (e) => {
+      currentDbKey = e.target.value;
+      cards = [...databases[currentDbKey]];
+      learnedIds.clear();
+      activeTab = 'all';
+      currentIndex = 0;
+      isFlipped = false;
+      
+      els.cardWrapper.classList.remove('flipped');
+      els.cardWrapper.style.transition = 'none';
+      els.cardWrapper.style.transform = 'translateX(0) rotate(0)';
+      
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      els.tabAll.classList.add('active');
+      
+      updateUI();
+    });
+
+    function scaleTextToFit() {
+      if (els.startScreen.classList.contains('hidden') === false) return;
+      
+      requestAnimationFrame(() => {
+        const currentCard = getFilteredCards()[currentIndex];
+        if (!currentCard) return;
+
+        const frontFace = document.querySelector('.card-front');
+        const backFace = document.querySelector('.card-back');
+        if (!frontFace || !backFace) return;
+
+        let measurer = document.getElementById('text-measurer');
+        if (!measurer) {
+          measurer = document.createElement('div');
+          measurer.id = 'text-measurer';
+          measurer.style.position = 'absolute';
+          measurer.style.visibility = 'hidden';
+          measurer.style.pointerEvents = 'none';
+          measurer.style.left = '-9999px';
+          measurer.style.top = '-9999px';
+          measurer.style.wordWrap = 'break-word';
+          measurer.style.overflowWrap = 'break-word';
+          measurer.style.textAlign = 'center';
+          measurer.style.lineHeight = '1.5';
+          measurer.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+          measurer.style.margin = '0';
+          document.body.appendChild(measurer);
+        }
+
+        const fitText = (container, textElement, text, isBack) => {
+          if (!container || !textElement || container.clientHeight === 0) return;
+
+          const style = window.getComputedStyle(container);
+          const paddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+          const paddingY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+
+          measurer.style.width = (container.clientWidth - paddingX) + 'px';
+          measurer.style.fontWeight = isBack ? '500' : '600';
+          measurer.textContent = text;
+
+          let maxAllowedHeight = container.clientHeight - paddingY - 10; 
+
+          if (isBack && els.cardTopicHint.style.display !== 'none') {
+            const hintStyle = window.getComputedStyle(els.cardTopicHint);
+            const hintHeight = els.cardTopicHint.offsetHeight + parseFloat(hintStyle.marginTop) + parseFloat(hintStyle.marginBottom);
+            maxAllowedHeight -= hintHeight;
+          }
+
+          let fontSize = window.innerWidth >= 768 ? 24 : 18.4;
+          measurer.style.fontSize = fontSize + 'px';
+
+          const minFontSize = 12; 
+          let safety = 50; 
+          
+          while (measurer.scrollHeight > maxAllowedHeight && fontSize > minFontSize && safety > 0) {
+            fontSize -= 0.5;
+            measurer.style.fontSize = fontSize + 'px';
+            safety--;
+          }
+
+          textElement.style.fontSize = fontSize + 'px';
+        };
+
+        fitText(frontFace, els.cardQuestion, currentCard.question, false);
+        fitText(backFace, els.cardAnswer, currentCard.answer, true);
+      });
+    }
+
+    window.addEventListener('resize', scaleTextToFit);
+
+    function getFilteredCards() {
+      return cards.filter(card => {
+        if (activeTab === 'learned') return learnedIds.has(card.id);
+        if (activeTab === 'learning') return !learnedIds.has(card.id);
+        return true;
+      });
+    }
+
+    function updateUI() {
+      els.tabAll.textContent = `Все термины (${cards.length})`;
+      els.tabLearning.textContent = `Осталось выучить (${cards.length - learnedIds.size})`;
+      els.tabLearned.textContent = `Выученные (${learnedIds.size})`;
+      els.fileStatusText.textContent = `Загружено: ${cards.length} карточек`;
+
+      const filtered = getFilteredCards();
+
+      if (filtered.length === 0) {
+        els.mainContent.style.display = 'none';
+        els.emptyState.style.display = 'block';
+      } else {
+        els.mainContent.style.display = 'flex';
+        els.emptyState.style.display = 'none';
+
+        if (currentIndex >= filtered.length) currentIndex = 0;
+
+        const currentCard = filtered[currentIndex];
+        els.cardQuestion.textContent = currentCard.question;
+        els.cardAnswer.textContent = currentCard.answer;
+        els.statusText.textContent = `Карточка ${currentIndex + 1} из ${filtered.length}`;
+
+        if (currentCard.topic) {
+          const match = currentCard.topic.match(/^(Тема\s*\d+\.?)/i);
+          const shortTopic = match ? match[1] : currentCard.topic;
+          els.cardTopicHint.innerHTML = `<svg class="icon icon-sm"><use href="#icon-book"></use></svg> <span>${shortTopic}</span>`;
+          els.cardTopicHint.style.display = 'flex';
+        } else {
+          els.cardTopicHint.style.display = 'none';
+        }
+
+        if (learnedIds.has(currentCard.id)) {
+          els.btnCheck.classList.add('active');
+          els.btnCheck.title = 'Убрать из выученных';
+        } else {
+          els.btnCheck.classList.remove('active');
+          els.btnCheck.title = 'Отметить как выученное';
+        }
+
+        scaleTextToFit();
       }
     }
 
-    // Управление вкладками
     function switchTab(tabId) {
-      // Меняем активный фон через CSS-переменную
-      document.documentElement.style.setProperty('--active-bg', `var(--bg-${tabId})`);
+      activeTab = tabId;
+      currentIndex = 0;
+      isFlipped = false;
+      els.cardWrapper.classList.remove('flipped');
       
-      // Сбрасываем стили всех кнопок
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.className = "tab-btn";
-      });
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).classList.add('active');
       
-      // Активируем нажатую кнопку
-      const activeBtn = document.getElementById('btn-' + tabId);
-      if (activeBtn) {
-        activeBtn.className = "tab-btn active";
+      updateUI();
+    }
+
+    els.tabAll.addEventListener('click', () => switchTab('all'));
+    els.tabLearning.addEventListener('click', () => switchTab('learning'));
+    els.tabLearned.addEventListener('click', () => switchTab('learned'));
+
+    let startX = 0, startY = 0, currentX = 0;
+    let isDragging = false;
+    let hasDragged = false;
+    let isScrolling = false;
+    let wasSwiped = false; 
+
+    function handleDragStart(clientX, clientY) {
+      isDragging = true;
+      hasDragged = false;
+      isScrolling = false;
+      wasSwiped = false;
+      startX = clientX;
+      startY = clientY;
+      currentX = startX;
+      els.cardWrapper.style.transition = 'none';
+    }
+
+    function handleDragMove(clientX, clientY, e) {
+      if (!isDragging) return;
+      
+      currentX = clientX;
+      const deltaX = currentX - startX;
+      const deltaY = clientY - startY;
+
+      if (!hasDragged && !isScrolling) {
+        if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 5) {
+          isScrolling = true;
+          isDragging = false; 
+          els.cardWrapper.style.transition = 'transform 0.25s ease';
+          els.cardWrapper.style.transform = 'translateX(0) rotate(0)';
+          return;
+        }
+        if (Math.abs(deltaX) > 5) {
+          hasDragged = true;
+        }
       }
 
-      // Скрываем весь контент
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.add('hidden-tab');
-      });
-      
-      // Показываем нужный блок
-      const activeTab = document.getElementById('tab-' + tabId);
-      if (activeTab) {
-        activeTab.classList.remove('hidden-tab');
+      if (isScrolling) return;
+
+      if (hasDragged) {
+        if (e.cancelable) e.preventDefault(); 
+        
+        wasSwiped = true;
+        const rotate = deltaX * 0.05;
+        els.cardWrapper.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
+        
+        if (deltaX > 20) {
+          els.badgeRight.style.opacity = Math.min(deltaX / 100, 1);
+          els.badgeLeft.style.opacity = 0;
+        } else if (deltaX < -20) {
+          els.badgeLeft.style.opacity = Math.min(Math.abs(deltaX) / 100, 1);
+          els.badgeRight.style.opacity = 0;
+        } else {
+          els.badgeRight.style.opacity = 0;
+          els.badgeLeft.style.opacity = 0;
+        }
       }
     }
 
-    // Инициализация при загрузке
-    initTheme();
+    function handleDragEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      
+      if (isScrolling) return;
+
+      const deltaX = currentX - startX;
+      
+      els.cardWrapper.style.transition = 'transform 0.3s ease-out';
+
+      const threshold = Math.max(window.innerWidth * 0.25, 80);
+
+      if (hasDragged) {
+        if (deltaX > threshold) {
+          handleSwipe('right');
+        } else if (deltaX < -threshold) {
+          handleSwipe('left');
+        } else {
+          els.cardWrapper.style.transform = 'translateX(0) rotate(0)';
+          els.badgeRight.style.opacity = 0;
+          els.badgeLeft.style.opacity = 0;
+        }
+      }
+    }
+
+    els.cardWrapper.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      handleDragStart(e.clientX, e.clientY);
+    });
+    window.addEventListener('mousemove', (e) => {
+      handleDragMove(e.clientX, e.clientY, e);
+    }, { passive: false });
+    window.addEventListener('mouseup', handleDragEnd);
+
+    els.cardWrapper.addEventListener('touchstart', (e) => {
+      handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    
+    window.addEventListener('touchmove', (e) => {
+      handleDragMove(e.touches[0].clientX, e.touches[0].clientY, e);
+    }, { passive: false });
+    
+    window.addEventListener('touchend', handleDragEnd);
+    window.addEventListener('touchcancel', handleDragEnd);
+
+    function handleSwipe(direction) {
+      const filtered = getFilteredCards();
+      if (filtered.length === 0) return;
+      const currentCard = filtered[currentIndex];
+
+      const throwX = direction === 'right' ? window.innerWidth : -window.innerWidth;
+      const rotate = direction === 'right' ? 30 : -30;
+      els.cardWrapper.style.transform = `translateX(${throwX}px) rotate(${rotate}deg)`;
+      
+      setTimeout(() => {
+        if (direction === 'right') {
+          learnedIds.add(currentCard.id);
+        } else {
+          learnedIds.delete(currentCard.id);
+        }
+
+        const newFiltered = cards.filter(c => {
+          if (activeTab === 'learned') return learnedIds.has(c.id);
+          if (activeTab === 'learning') return !learnedIds.has(c.id);
+          return true;
+        });
+
+        if (newFiltered.length > 0) {
+          if (newFiltered.find(c => c.id === currentCard.id)) {
+            currentIndex = (currentIndex + 1) % newFiltered.length;
+          } else {
+            if (currentIndex >= newFiltered.length) currentIndex = 0;
+          }
+        } else {
+          currentIndex = 0;
+        }
+
+        isFlipped = false;
+        els.cardWrapper.classList.remove('flipped');
+        
+        els.cardWrapper.style.transition = 'none';
+        els.cardWrapper.style.transform = 'translateX(0) rotate(0)';
+        els.badgeRight.style.opacity = 0;
+        els.badgeLeft.style.opacity = 0;
+        
+        updateUI();
+      }, 300);
+    }
+
+    els.cardWrapper.addEventListener('click', (e) => {
+      if (wasSwiped) {
+        e.preventDefault();
+        return;
+      }
+      isFlipped = !isFlipped;
+      els.cardWrapper.classList.toggle('flipped', isFlipped);
+    });
+
+    els.btnNext.addEventListener('click', () => {
+      const filtered = getFilteredCards();
+      if (filtered.length <= 1) return;
+      isFlipped = false;
+      els.cardWrapper.classList.remove('flipped');
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % filtered.length;
+        updateUI();
+      }, 150);
+    });
+
+    els.btnPrev.addEventListener('click', () => {
+      const filtered = getFilteredCards();
+      if (filtered.length <= 1) return;
+      isFlipped = false;
+      els.cardWrapper.classList.remove('flipped');
+      setTimeout(() => {
+        currentIndex = (currentIndex - 1 + filtered.length) % filtered.length;
+        updateUI();
+      }, 150);
+    });
+
+    els.btnShuffle.addEventListener('click', () => {
+      const filtered = getFilteredCards();
+      if (filtered.length <= 1) return;
+      isFlipped = false;
+      els.cardWrapper.classList.remove('flipped');
+      setTimeout(() => {
+        cards.sort(() => Math.random() - 0.5);
+        currentIndex = 0;
+        updateUI();
+      }, 150);
+    });
+
+    els.btnCheck.addEventListener('click', () => {
+      const filtered = getFilteredCards();
+      if (filtered.length === 0) return;
+      const currentCard = filtered[currentIndex];
+      
+      if (learnedIds.has(currentCard.id)) {
+        learnedIds.delete(currentCard.id);
+      } else {
+        learnedIds.add(currentCard.id);
+      }
+      updateUI();
+    });
+
+    els.btnTheme.addEventListener('click', () => {
+      theme = theme === 'light' ? 'dark' : 'light';
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        els.themeIconUse.setAttribute('href', '#icon-sun');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        els.themeIconUse.setAttribute('href', '#icon-moon');
+      }
+    });
+
+    updateUI();
   </script>
 </body>
 </html>
